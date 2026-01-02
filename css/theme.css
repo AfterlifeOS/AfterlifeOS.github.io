@@ -17,7 +17,7 @@
     
     /* Spacing & Layout */
     --nav-height: 80px;
-    --container-width: 1200px;
+    --container-width: 1400px; /* Diperlebar dari 1200px */
     --radius-sm: 8px;
     --radius-md: 16px;
     --radius-lg: 24px;

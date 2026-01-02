@@ -66,6 +66,7 @@
 /* --- Global Background Texture --- */
 body {
     background-color: var(--bg-body);
+    /* Grid texture halus */
     background-image: 
         linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
@@ -75,29 +76,32 @@ body {
 
 /* --- Layout --- */
 .container {
+    width: 100%;
     max-width: var(--container-width);
     margin: 0 auto;
     padding: 0 24px;
+    box-sizing: border-box;
 }
 
 /* --- Slogan Badge --- */
 .tagline-badge {
     display: inline-block;
     font-family: 'Courier New', monospace; /* Monospace for tech feel */
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     color: var(--color-primary);
     border: 1px solid rgba(0, 255, 157, 0.3);
     background: rgba(0, 255, 157, 0.05);
-    padding: 4px 12px;
+    padding: 6px 14px;
     border-radius: 4px;
     letter-spacing: 2px;
     text-transform: uppercase;
-    margin-bottom: 15px;
-    box-shadow: 0 0 10px rgba(0, 255, 157, 0.1);
+    margin-bottom: 20px;
+    box-shadow: 0 0 15px rgba(0, 255, 157, 0.1);
 }
 
 .section {
-    padding: 100px 0;
+    padding: 80px 0;
+    position: relative;
 }
 
 /* --- Components: Buttons --- */
@@ -105,13 +109,14 @@ body {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: 12px 32px;
+    padding: 14px 36px;
     border-radius: 50px;
-    font-weight: 500;
-    font-size: 1rem;
+    font-weight: 600;
+    font-size: 1.05rem;
     cursor: pointer;
     transition: all 0.3s ease;
     border: none;
+    letter-spacing: 0.5px;
 }
 
 .btn-primary {
@@ -138,14 +143,14 @@ body {
 /* --- Components: Navbar --- */
 .navbar {
     height: var(--nav-height);
-    background: rgba(5, 5, 5, 0.8);
-    backdrop-filter: blur(10px);
+    background: rgba(5, 5, 5, 0.85); /* Sedikit lebih gelap */
+    backdrop-filter: blur(12px);
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 1000;
-    border-bottom: var(--border-subtle);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .nav-container {
@@ -156,8 +161,8 @@ body {
 }
 
 .nav-logo {
-    font-size: 1.5rem;
-    font-weight: 700;
+    font-size: 1.6rem;
+    font-weight: 800;
     letter-spacing: -0.5px;
 }
 
@@ -169,6 +174,8 @@ body {
 .nav-links a {
     color: var(--text-muted);
     font-weight: 500;
+    font-size: 1rem;
+    transition: color 0.3s;
 }
 
 .nav-links a:hover, .nav-links a.active {
@@ -185,7 +192,7 @@ body {
 /* --- Components: Footer --- */
 .footer {
     background: var(--bg-surface);
-    padding: 60px 0 30px;
+    padding: 80px 0 30px;
     border-top: var(--border-subtle);
     margin-top: auto;
 }
@@ -193,21 +200,23 @@ body {
 .footer-content {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 40px;
-    margin-bottom: 40px;
+    gap: 50px;
+    margin-bottom: 50px;
 }
 
 .footer-col h4 {
     color: var(--text-main);
-    margin-bottom: 20px;
+    margin-bottom: 24px;
+    font-size: 1.2rem;
 }
 
 .footer-col ul li {
-    margin-bottom: 12px;
+    margin-bottom: 14px;
 }
 
 .footer-col a {
     color: var(--text-muted);
+    font-size: 0.95rem;
 }
 
 .footer-col a:hover {
@@ -237,8 +246,30 @@ body {
     border-color: rgba(0, 255, 157, 0.3);
 }
 
-/* --- Responsive --- */
-@media (max-width: 768px) {
+/* --- High Resolution Scaling --- */
+@media (min-width: 1600px) {
+    html {
+        font-size: 18px; /* Menaikkan base font size agar semua elemen membesar */
+    }
+    .container {
+        max-width: 1600px; /* Container lebih lebar untuk layar 4K */
+    }
+    .section {
+        padding: 100px 0;
+    }
+}
+
+@media (min-width: 2200px) {
+    html {
+        font-size: 20px; 
+    }
+    .container {
+        max-width: 1800px;
+    }
+}
+
+/* --- Responsive Mobile --- */
+@media (max-width: 900px) {
     .nav-links {
         position: fixed;
         top: var(--nav-height);
@@ -246,11 +277,12 @@ body {
         right: 0;
         background: var(--bg-body);
         flex-direction: column;
-        padding: 24px;
-        gap: 20px;
+        padding: 30px;
+        gap: 24px;
         border-bottom: var(--border-subtle);
         transform: translateY(-150%);
-        transition: transform 0.3s ease;
+        transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     }
 
     .nav-links.active {
@@ -259,6 +291,10 @@ body {
 
     .mobile-toggle {
         display: block;
+    }
+    
+    .section {
+        padding: 60px 0;
     }
 }
 
@@ -290,8 +326,8 @@ body {
 
 .downloads-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-    gap: 24px;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 30px;
     width: 100%;
 }
 
@@ -299,19 +335,40 @@ body {
     background: var(--bg-card);
     border: var(--border-subtle);
     border-radius: var(--radius-md);
-    padding: 20px;
+    padding: 24px;
     text-align: center;
     cursor: pointer;
     transition: all 0.3s ease;
     display: flex;
     flex-direction: column;
     align-items: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.device-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle at center, rgba(0,255,157,0.05), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.device-card:hover::after {
+    opacity: 1;
 }
 
 .device-card img {
     max-width: 100%;
     height: auto;
     object-fit: contain;
+    z-index: 1;
+    transition: transform 0.3s;
+}
+
+.device-card:hover img {
+    transform: scale(1.05);
 }
 
 /* Modal Responsive Fixes & Animation */
@@ -322,7 +379,7 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0,0,0,0.8);
+    background: rgba(0,0,0,0.85);
     z-index: 2000;
     justify-content: center;
     align-items: center;
@@ -330,6 +387,7 @@ body {
     box-sizing: border-box;
     opacity: 0;
     transition: opacity 0.3s ease;
+    backdrop-filter: blur(5px);
 }
 
 .modal-overlay.active {
@@ -343,9 +401,9 @@ body {
 
 .modal-content {
     background: var(--bg-card);
-    padding: 30px;
-    border-radius: 16px;
-    max-width: 500px;
+    padding: 40px;
+    border-radius: 20px;
+    max-width: 550px;
     width: 100%;
     position: relative;
     border: 1px solid var(--color-primary);
@@ -354,6 +412,7 @@ body {
     box-sizing: border-box;
     transform: scale(0.9);
     transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* Bouncy effect */
+    box-shadow: 0 0 50px rgba(0, 255, 157, 0.15);
 }
 
 .modal-overlay.active .modal-content {
@@ -390,9 +449,9 @@ body {
 .modal-tabs {
     display: flex;
     background: var(--bg-surface);
-    padding: 4px;
+    padding: 6px;
     border-radius: 50px;
-    margin-bottom: 24px;
+    margin-bottom: 30px;
     position: relative;
     border: 1px solid var(--border-subtle);
 }
@@ -401,13 +460,14 @@ body {
     flex: 1;
     background: transparent;
     border: none;
-    padding: 10px 20px;
+    padding: 12px 24px;
     border-radius: 40px;
     color: var(--text-muted);
-    font-weight: 500;
+    font-weight: 600;
     cursor: pointer;
     transition: all 0.3s ease;
     text-align: center;
+    font-size: 0.95rem;
 }
 
 .tab-btn.active {
@@ -425,31 +485,33 @@ body {
 /* --- Team Page Hierarchy --- */
 .team-section-header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 50px;
     position: relative;
 }
 
 .team-section-header::after {
     content: '';
     display: block;
-    width: 60px;
+    width: 80px;
     height: 4px;
     background: var(--color-primary);
-    margin: 15px auto 0;
+    margin: 20px auto 0;
     border-radius: 2px;
+    box-shadow: 0 0 10px var(--color-primary);
 }
 
 .team-avatar-lg {
-    width: 120px;
-    height: 120px;
+    width: 140px;
+    height: 140px;
     border-radius: 50%;
-    margin: 0 auto 20px;
+    margin: 0 auto 24px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 3rem;
+    font-size: 3.5rem;
     position: relative;
     z-index: 1;
+    border: 3px solid rgba(0, 255, 157, 0.3);
 }
 
 .team-avatar-lg::before {
@@ -460,12 +522,12 @@ body {
     border-radius: 50%;
     z-index: -1;
     opacity: 0.5;
-    filter: blur(10px);
+    filter: blur(15px);
 }
 
 .team-avatar-md {
-    width: 90px;
-    height: 90px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
     margin: 0 auto 15px;
     display: flex;
@@ -477,8 +539,8 @@ body {
 }
 
 .team-avatar-sm {
-    width: 60px;
-    height: 60px;
+    width: 70px;
+    height: 70px;
     border-radius: 50%;
     margin: 0 auto 10px;
     display: flex;
@@ -492,19 +554,19 @@ body {
 /* Role Badges */
 .role-badge {
     display: inline-block;
-    padding: 4px 12px;
+    padding: 6px 14px;
     border-radius: 20px;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-weight: bold;
     margin-bottom: 15px;
     text-transform: uppercase;
     letter-spacing: 0.5px;
 }
 
-.role-lead { background: rgba(255, 215, 0, 0.2); color: #ffd700; border: 1px solid #ffd700; }
-.role-core { background: rgba(0, 194, 255, 0.2); color: var(--color-secondary); border: 1px solid var(--color-secondary); }
-.role-design { background: rgba(255, 0, 221, 0.2); color: #ff00dd; border: 1px solid #ff00dd; }
-.role-contrib { background: rgba(0, 255, 157, 0.2); color: var(--color-primary); border: 1px solid var(--color-primary); }
+.role-lead { background: rgba(255, 215, 0, 0.15); color: #ffd700; border: 1px solid #ffd700; box-shadow: 0 0 10px rgba(255, 215, 0, 0.1); }
+.role-core { background: rgba(0, 194, 255, 0.15); color: var(--color-secondary); border: 1px solid var(--color-secondary); }
+.role-design { background: rgba(255, 0, 221, 0.15); color: #ff00dd; border: 1px solid #ff00dd; }
+.role-contrib { background: rgba(0, 255, 157, 0.15); color: var(--color-primary); border: 1px solid var(--color-primary); }
 .role-maintainer { background: rgba(255, 255, 255, 0.1); color: var(--text-muted); border: 1px solid var(--text-muted); }
 
 /* Card Variations */
