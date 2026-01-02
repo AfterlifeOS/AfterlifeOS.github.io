@@ -1,0 +1,82 @@
+{
+  "leads": [
+    {
+      "name": "Romeo Delta Whiskey",
+      "role": "Founder & Lead Developer",
+      "github": "RdW-afk",
+      "quote": "Building the afterlife, one line at a time."
+    }
+  ],
+  "core": [
+    {
+      "name": "xarilsmn",
+      "role": "Co-Founder",
+      "github": "xarilsmn",
+      "quote": "Crafting stability where chaos once reigned."
+    },
+    {
+      "name": "Skyy",
+      "role": "Core Developer",
+      "github": "HinohArata",
+      "quote": "For the community, by the community."
+    }
+  ],
+  "designers": [
+    {
+      "name": "ᄅ0ㄣ⇂XᴚƆ",
+      "role": "UI/UX Designer",
+      "github": "Indra1402-sfyn",
+      "quote": "Beauty is in the details you don't notice."
+    },
+    {
+      "name": "nssʇıǝɹ",
+      "role": "UI/UX Designer",
+      "github": "itssu4012650",
+      "quote": "Design is intelligence made visible."
+    },
+    {
+      "name": "vyzentreca",
+      "role": "Code Maker and UI/UX Designer",
+      "github": "vyzentreca",
+      "quote": "Simplicity is the ultimate sophistication."
+    },
+    {
+      "name": "KaeruShi",
+      "role": "UI/UX Designer",
+      "github": "KaeruShi",
+      "quote": "Making pixels dance in perfect harmony."
+    },
+    {
+      "name": "Declanヅ",
+      "role": "UI/UX Designer",
+      "github": "DeclanG9",
+      "quote": "Visuals that speak louder than code."
+    },
+    {
+      "name": "Joko Jr😎",
+      "role": "UI/UX Designer",
+      "github": "703joko",
+      "quote": "Form follows function, but style matters."
+    }
+  ],
+  "contributors": [
+    {
+      "name": "Iverz",
+      "role": "Contributor",
+      "github": "asterixiverz",
+      "quote": "Here to help, learn, and grow."
+    },
+    {
+      "name": "QueenSerenade",
+      "role": "Contributor",
+      "github": "Tiktodz",
+      "quote": "Part of the Afterlife family."
+    },
+    {
+      "name": "Community",
+      "role": "Contributor",
+      "github": "AfterlifeOS",
+      "quote": "Thanks to everyone who helped."
+    }
+  ]
+}

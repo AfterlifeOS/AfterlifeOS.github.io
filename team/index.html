@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Our Team - AfterlifeOS</title>
+    <link rel="icon" href="/img/favicon.ico" type="image/x-icon">
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="container nav-container">
+            <a href="/" class="nav-logo text-gradient">AfterlifeOS</a>
+            <div class="mobile-toggle" id="mobileToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="/">Home</a></li>
+                <li><a href="/features/">Features</a></li>
+                <li><a href="/about/">About</a></li>
+                <li><a href="/team/" class="active">Team</a></li>
+                <li><a href="/changelog/">Changelog</a></li>
+                <li><a href="https://t.me/AfterlifeOS_hrdbot?text=/start" target="_blank" class="btn btn-outline" style="padding: 8px 24px; margin-right: 10px;">Join Family</a></li>
+                <li><a href="/download/" class="btn btn-primary" style="padding: 8px 24px; color: #000;">Download</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="header-spacer" style="height: var(--nav-height);"></div>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-header" style="text-align: center; margin-bottom: 80px;">
+                <h1 class="text-gradient">The Minds Behind Afterlife</h1>
+                <p style="color: var(--text-muted);">Crafting the future of your device, line by line.</p>
+            </div>
+
+            <!-- 1. Project Lead -->
+            <div class="team-section animate-on-scroll" style="margin-bottom: 80px;">
+                <div class="team-section-header">
+                    <h2 style="color: #ffd700;">Project Lead</h2>
+                </div>
+                <div id="lead-container" style="display: flex; justify-content: center;">
+                    <!-- Loaded from team.json -->
+                    <i class="fas fa-spinner fa-spin text-muted"></i>
+                </div>
+            </div>
+
+            <!-- 2. Core Team -->
+            <div class="team-section animate-on-scroll" style="margin-bottom: 80px;">
+                <div class="team-section-header">
+                    <h2 style="color: var(--color-secondary);">Core Team</h2>
+                </div>
+                <div id="core-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+                    <!-- Loaded from team.json -->
+                </div>
+            </div>
+
+            <!-- 3. Designers -->
+            <div class="team-section animate-on-scroll" style="margin-bottom: 80px;">
+                <div class="team-section-header">
+                    <h2 style="color: #ff00dd;">Creative Minds</h2>
+                </div>
+                <div id="designers-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px;">
+                     <!-- Loaded from team.json -->
+                </div>
+            </div>
+
+            <!-- 4. Contributors -->
+            <div class="team-section animate-on-scroll" style="margin-bottom: 60px;">
+                <div class="team-section-header">
+                    <h2 style="color: var(--color-primary);">Contributors</h2>
+                </div>
+                <div id="contributors-container" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; max-width: 800px; margin: 0 auto;">
+                     <!-- Loaded from team.json -->
+                </div>
+            </div>
+
+            <!-- 5. Maintainers -->
+            <div class="team-section animate-on-scroll">
+                <div class="team-section-header">
+                    <h2 style="color: var(--text-muted);">Device Maintainers</h2>
+                </div>
+                <div id="maintainers-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px;">
+                    <!-- Loaded from maintainers.json -->
+                    <div style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">
+                        <i class="fas fa-spinner fa-spin"></i> Loading maintainers...
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-col">
+                    <h4 class="text-gradient">AfterlifeOS</h4>
+                    <p class="text-muted">Reviving devices, one flash at a time.</p>
+                </div>
+                <div class="footer-col">
+                    <h4>Links</h4>
+                    <ul>
+                        <li><a href="/download/">Download</a></li>
+                        <li><a href="/features/">Features</a></li>
+                        <li><a href="/changelog/">Changelog</a></li>
+                    </ul>
+                </div>
+                <div class="footer-col">
+                    <h4>Community</h4>
+                    <ul>
+                        <li><a href="https://t.me/Afterlife_update" target="_blank">Telegram</a></li>
+                        <li><a href="https://github.com/AfterlifeOS" target="_blank">GitHub</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom"><p>&copy; 2025 AfterlifeOS. All Rights Reserved.</p></div>
+        </div>
+    </footer>
+
+    <script src="/js/main.js"></script>
+    <script src="/js/team.js"></script>
+</body>
+</html>
