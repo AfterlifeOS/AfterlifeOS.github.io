@@ -69,7 +69,7 @@
             </div>
 
             <!-- 4. Contributors -->
-            <div class="team-section animate-on-scroll" style="margin-bottom: 60px;">
+            <div class="team-section animate-on-scroll" style="margin-bottom: 80px;">
                 <div class="team-section-header">
                     <h2 style="color: var(--color-primary);">Contributors</h2>
                 </div>
@@ -78,7 +78,17 @@
                 </div>
             </div>
 
-            <!-- 5. Maintainers -->
+            <!-- 5. The Doctors -->
+            <div class="team-section animate-on-scroll" style="margin-bottom: 60px;">
+                <div class="team-section-header">
+                    <h2 style="color: #00e5ff;">The Doctors</h2>
+                </div>
+                <div id="doctors-container" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 30px; max-width: 1000px; margin: 0 auto;">
+                     <!-- Loaded from team.json -->
+                </div>
+            </div>
+
+            <!-- 6. Maintainers -->
             <div class="team-section animate-on-scroll">
                 <div class="team-section-header">
                     <h2 style="color: var(--text-muted);">Device Maintainers</h2>
@@ -143,7 +153,8 @@
            Mobile: 1 Column */
         #core-container .card,
         #designers-container .card,
-        #contributors-container .card {
+        #contributors-container .card,
+        #doctors-container .card {
             width: 100%;
             max-width: 350px;
         }
@@ -152,7 +163,8 @@
         @media (min-width: 768px) {
             #core-container .card,
             #designers-container .card,
-            #contributors-container .card {
+            #contributors-container .card,
+            #doctors-container .card {
                 width: calc(50% - 16px); /* Gap 30px */
             }
         }

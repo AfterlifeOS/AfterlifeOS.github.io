@@ -78,5 +78,13 @@
       "github": "AfterlifeOS",
       "quote": "Thanks to everyone who helped."
     }
+  ],
+  "doctors": [
+    {
+      "name": "NSLVIP",
+      "role": "Donator",
+      "github": "nslvip",
+      "quote": "Preserving the heartbeat of innovation."
+    }
   ]
 }

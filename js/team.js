@@ -13,6 +13,7 @@ async function loadCoreTeam() {
         renderSection('core-container', data.core, '', 'team-avatar-md');
         renderSection('designers-container', data.designers, '', 'team-avatar-md');
         renderSection('contributors-container', data.contributors, '', 'team-avatar-sm');
+        renderSection('doctors-container', data.doctors, '', 'team-avatar-sm');
     } catch (error) {
         console.error(error);
     }
