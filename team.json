@@ -82,7 +82,7 @@
   "doctors": [
     {
       "name": "NSLVIP",
-      "role": "Donator",
+      "role": "Doctor",
       "github": "nslvip",
       "quote": "Preserving the heartbeat of innovation."
     }

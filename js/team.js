@@ -9,11 +9,11 @@ async function loadCoreTeam() {
         if (!response.ok) throw new Error('Failed to load team data');
         const data = await response.json();
 
-        renderSection('lead-container', data.leads, 'card-lead', 'team-avatar-lg');
-        renderSection('core-container', data.core, '', 'team-avatar-md');
-        renderSection('designers-container', data.designers, '', 'team-avatar-md');
-        renderSection('contributors-container', data.contributors, '', 'team-avatar-sm');
-        renderSection('doctors-container', data.doctors, '', 'team-avatar-sm');
+        renderSection('lead-container', data.leads, 'card-lead', 'team-avatar-lg', 'role-lead');
+        renderSection('core-container', data.core, '', 'team-avatar-md', 'role-core');
+        renderSection('designers-container', data.designers, '', 'team-avatar-md', 'role-design');
+        renderSection('contributors-container', data.contributors, '', 'team-avatar-sm', 'role-contrib');
+        renderSection('doctors-container', data.doctors, '', 'team-avatar-md', 'role-doctor');
     } catch (error) {
         console.error(error);
     }
@@ -85,7 +85,7 @@ async function loadMaintainers() {
     }
 }
 
-function renderSection(containerId, members, cardClass, avatarClass) {
+function renderSection(containerId, members, cardClass, avatarClass, roleClass) {
     const container = document.getElementById(containerId);
     if (!container || !members) return;
 
@@ -105,7 +105,7 @@ function renderSection(containerId, members, cardClass, avatarClass) {
             </div>
             <div style="text-align: center;">
                 <h3 style="margin-bottom: 5px;">${member.name}</h3>
-                <span class="role-badge role-core" style="margin-bottom: 10px; display: inline-block;">${member.role}</span>
+                <span class="role-badge ${roleClass}" style="margin-bottom: 10px; display: inline-block;">${member.role}</span>
                 <p style="color: var(--text-muted); font-style: italic; font-size: 0.9rem; margin-bottom: 15px;">"${member.quote}"</p>
                 <div class="social-links">
                     ${member.github ? `<a href="${profileUrl}" target="_blank"><i class="fab fa-github fa-lg"></i></a>` : ''}

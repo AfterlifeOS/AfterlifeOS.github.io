@@ -568,6 +568,7 @@ body {
 .role-design { background: rgba(255, 0, 221, 0.15); color: #ff00dd; border: 1px solid #ff00dd; }
 .role-contrib { background: rgba(0, 255, 157, 0.15); color: var(--color-primary); border: 1px solid var(--color-primary); }
 .role-maintainer { background: rgba(255, 255, 255, 0.1); color: var(--text-muted); border: 1px solid var(--text-muted); }
+.role-doctor { background: rgba(0, 229, 255, 0.25); color: #00e5ff; border: 1px solid #00e5ff; box-shadow: 0 0 10px rgba(0, 229, 255, 0.3); }
 
 /* Card Variations */
 .card-lead {
