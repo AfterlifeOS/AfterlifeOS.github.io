@@ -13,7 +13,7 @@ async function loadCoreTeam() {
         renderSection('core-container', data.core, '', 'team-avatar-md', 'role-core');
         renderSection('designers-container', data.designers, '', 'team-avatar-md', 'role-design');
         renderSection('contributors-container', data.contributors, '', 'team-avatar-sm', 'role-contrib');
-        renderSection('doctors-container', data.doctors, '', 'team-avatar-md', 'role-doctor');
+        renderSection('doctors-container', data.doctors, '', 'team-avatar-sm', 'role-doctor');
     } catch (error) {
         console.error(error);
     }
