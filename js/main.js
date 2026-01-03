@@ -170,7 +170,7 @@ async function loadMaintainers() {
             const avatarUrl = m.github_username ? `https://github.com/${m.github_username}.png?size=60` : null;
             
             return `
-            <div class="card" style="text-align: center; padding: 20px; border-color: rgba(255,255,255,0.05); transition: transform 0.2s;">
+            <div class="card" style="text-align: center; padding: 15px; border-color: rgba(255,255,255,0.05); transition: transform 0.2s;">
                 <div class="team-avatar-sm" style="border-color: #333; font-size: 1.2rem; overflow: hidden; background: #000;">
                     ${avatarUrl 
                         ? `<img src="${avatarUrl}" alt="${m.name}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.parentElement.innerHTML='<i class=\'fas fa-user\'></i>'">` 
