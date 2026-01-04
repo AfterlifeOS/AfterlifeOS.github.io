@@ -32,8 +32,8 @@
     <section class="hero">
         <!-- Background Collage Elements -->
         <div class="hero-bg-collage">
-            <img src="/img/screenshot_1.webp" alt="" class="collage-img img-left">
-            <img src="/img/screenshot_2.webp" alt="" class="collage-img img-right">
+            <img src="/img/screenshot_1.webp" alt="" class="collage-img img-left" style="opacity: 0;">
+            <img src="/img/screenshot_2.webp" alt="" class="collage-img img-right" style="opacity: 0;">
             <div class="hero-overlay-gradient"></div>
         </div>
 
@@ -329,14 +329,22 @@
 
         .hero {
             position: relative;
-            min-height: 90vh;
+            min-height: 80vh; /* Reduced from 90vh */
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
             padding-top: var(--nav-height);
-            padding-bottom: 80px;
+            padding-bottom: 60px;
             /* Background grid removed here as it is now global on body */
+        }
+        
+        /* Tablet/Pad Specific Adjustments */
+        @media (min-width: 601px) and (max-width: 1248px) {
+            .hero {
+                min-height: 70vh; /* Much shorter for tablets */
+                padding-top: 100px;
+            }
         }
         
         /* Background Collage Styling */
@@ -391,12 +399,15 @@
         }
         
         .hero-content {
-             background: radial-gradient(circle, rgba(0,0,0,0.6) 0%, transparent 70%); /* Local text backdrop */
-             padding: 40px;
-             border-radius: 50%; /* Soft edge backdrop */
+             /* Much softer gradient that fades completely before edges */
+             background: radial-gradient(closest-side, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.5) 40%, transparent 100%);
+             padding: 40px 20px;
+             /* Removed border-radius: 50% to prevent visible clipping shape */
              text-align: center;
              max-width: 850px;
              margin: 0 auto;
+             position: relative;
+             z-index: 10; /* Ensure text is above images */
         }
 
         .hero-cta {
@@ -427,27 +438,35 @@
 
         /* Responsive Background Image Handling */
         .collage-img {
-            width: 200px; /* Balanced size */
+            width: 180px; /* Significantly reduced for narrow screens */
             filter: drop-shadow(0 15px 30px rgba(0,0,0,0.6));
+            opacity: 0; /* Start invisible */
+        }
+
+        /* Custom animation for mobile to keep opacity low (0.3) */
+        .collage-img { animation: floatInMobile 1.5s ease-out forwards; }
+
+        @keyframes floatInMobile {
+            to { opacity: 0.75; } /* Lower opacity on mobile */
         }
 
         .img-left {
-            top: 10%;
-            left: -45px;
-            transform: rotate(25deg);
+            top: 5%;
+            left: -40px; /* Pushed very far out */
+            transform: rotate(25deg); /* Minimal rotation */
             z-index: 0;
         }
 
         .img-right {
-            bottom: -5%;
-            right: -45px;
-            transform: rotate(-25deg);
+            bottom: -10%;
+            right: -40px; /* Pushed very far out */
+            transform: rotate(-25deg); /* Minimal rotation */
             z-index: 0;
         }
 
         /* Desktop Adjustments */
-        @media (min-width: 768px) {
-            .collage-img { width: 280px; } /* Reduced to 300px */
+        @media (min-width: 1392px) {
+            .collage-img { width: 380px; }
             
             /* Precision positioning for Desktop framing */
             .img-left { 
@@ -456,8 +475,34 @@
                 transform: rotate(30deg); 
             }
             .img-right { 
-                right: -40px; 
-                bottom: -60%; 
+                right: -25px; 
+                bottom: -10%; 
+                transform: rotate(-30deg); 
+            }
+            
+            .hero-overlay-gradient {
+                 /* Aggressive bottom fade to ensure images are fully covered at the bottom */
+                 background: radial-gradient(circle at center, var(--bg-body) 20%, rgba(5,5,5,0.5) 60%, transparent 100%)
+            }
+            
+            .hero-content {
+                 background: none; 
+                 padding: 0 20px;
+            }
+        }
+
+        @media (min-height: 1248px) {
+            .collage-img { width: 380px; }
+            
+            /* Precision positioning for Desktop framing */
+            .img-left { 
+                left: -25px; 
+                top: -5%; 
+                transform: rotate(30deg); 
+            }
+            .img-right { 
+                right: -25px; 
+                bottom: 50%; 
                 transform: rotate(-30deg); 
             }
             
@@ -501,21 +546,23 @@
         .content-gallery {
             position: relative;
             width: 100%;
-            max-width: 320px; /* Slightly larger */
+            max-width: 260px; 
             margin: 0 auto;
-            aspect-ratio: 9/19;
+            aspect-ratio: 9/19; /* Maintains phone shape */
             perspective: 1000px;
         }
         
         .screenshot-scroller {
-            display: grid;
+            position: relative;
             width: 100%;
             height: 100%;
+            overflow: hidden; /* Ensure nothing sticks out */
         }
         
         .screenshot-scroller img {
-            grid-column: 1;
-            grid-row: 1;
+            position: absolute; /* Key fix: Force overlapping */
+            top: 0;
+            left: 0;
             width: 100%;
             height: 100%;
             object-fit: cover;
@@ -694,12 +741,11 @@
                 text-align: left; 
                 margin-top: 20px;
             }
-            .content-gallery { max-width: 260px; }
             
-            /* Enlarge hero image on mobile */
-            .hero-image img {
-                max-width: 280px; /* Increased to be clearer on mobile */
-                max-height: 500px;
+            /* Screenshot Gallery Mobile Adjustment */
+            .content-gallery { 
+                max-width: 180px; /* Further reduced to ensure it fits comfortably */
+                margin: 0 auto;
             }
         }
     </style>
