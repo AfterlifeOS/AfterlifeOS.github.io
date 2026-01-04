@@ -374,37 +374,38 @@ body {
 
     /* The Animated Typewriter Text Overlay */
     .nav-logo::before {
-        content: 'AfterlifeOS'; /* Duplicate text for animation */
+        content: 'AfterlifeOS'; 
         position: absolute;
-        left: 16px; /* Matches parent padding */
-        color: #00e5ff; /* Cyan Text */
+        left: 14px; 
+        color: #00e5ff; 
         
         overflow: hidden;
         white-space: nowrap;
+        will-change: width; /* Optimization */
         
-        /* Cursor Styling - Matched to text height */
+        /* Cursor Styling */
         border-right: 2px solid #00e5ff; 
-        height: 1.2em; /* Limits cursor height */
-        line-height: 1.2em; /* Centers text in height */
+        height: 0.85em; 
+        line-height: 0.85em; 
         top: 50%;
-        transform: translateY(-50%); /* Vertically centers the overlay */
+        transform: translateY(-50%); 
         
         /* Animation properties */
         width: 0;
         animation: 
-            typing 5s steps(11, end) infinite,
-            blink .75s step-end infinite;
+            typing 6s steps(11, end) infinite,
+            cursor-blink 1s step-end infinite;
     }
 
-    /* Typewriter Keyframes */
+    /* Typewriter Keyframes - Smoother Loop */
     @keyframes typing {
-        0%, 5% { width: 0; }
-        40%, 80% { width: 11ch; } /* Reveal text (11 chars) */
-        100% { width: 0; }
+        0%, 15% { width: 0; }
+        40%, 85% { width: 11ch; } /* Type fast, hold for a long time */
+        100% { width: 0; } /* Quick delete at the very end */
     }
 
-    @keyframes blink {
-        from, to { border-color: transparent; }
+    @keyframes cursor-blink {
+        0%, 100% { border-color: transparent; }
         50% { border-color: #00e5ff; }
     }
 
