@@ -30,8 +30,15 @@
     </nav>
 
     <section class="hero">
+        <!-- Background Collage Elements -->
+        <div class="hero-bg-collage">
+            <img src="/img/screenshot_1.webp" alt="" class="collage-img img-left">
+            <img src="/img/screenshot_2.webp" alt="" class="collage-img img-right">
+            <div class="hero-overlay-gradient"></div>
+        </div>
+
         <div class="container hero-container animate-on-scroll">
-            <div class="hero-content">
+            <div class="hero-content centered-content">
                 <span class="tagline-badge">#NeverDie</span>
                 <h1 class="hero-title">
                     Revive Your Device with <span class="text-gradient">AfterlifeOS</span>
@@ -43,9 +50,6 @@
                     <a href="/download/" class="btn btn-primary">Get Started <i class="fas fa-arrow-right" style="margin-left: 8px;"></i></a>
                     <a href="/features/" class="btn btn-outline">Explore Features</a>
                 </div>
-            </div>
-            <div class="hero-image">
-                <img src="/img/home.webp" alt="AfterlifeOS Preview" class="floating-image">
             </div>
         </div>
     </section>
@@ -67,6 +71,7 @@
                     <div class="nav-zone nav-prev" id="navPrev"></div>
                     <div class="nav-zone nav-next" id="navNext"></div>
                     <div class="screenshot-scroller">
+                        <img src="/img/home.webp" alt="Home Preview">
                         <img src="/img/screenshot_1.webp" alt="UI Screenshot 1">
                         <img src="/img/screenshot_2.webp" alt="UI Screenshot 2">
                         <img src="/img/screenshot_3.webp" alt="UI Screenshot 3">
@@ -312,22 +317,11 @@
             content: '';
             position: absolute;
             top: -20%;
-            left: -10%;
-            width: 50%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80%;
             height: 80%;
-            background: radial-gradient(circle, rgba(0, 255, 157, 0.08) 0%, transparent 70%);
-            z-index: 0;
-            pointer-events: none;
-            filter: blur(80px);
-        }
-        .hero::after {
-            content: '';
-            position: absolute;
-            bottom: -10%;
-            right: -10%;
-            width: 60%;
-            height: 60%;
-            background: radial-gradient(circle, rgba(0, 194, 255, 0.08) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(0, 255, 157, 0.12) 0%, transparent 60%);
             z-index: 0;
             pointer-events: none;
             filter: blur(80px);
@@ -335,93 +329,174 @@
 
         .hero {
             position: relative;
-            min-height: 85vh; /* Tinggi optimal */
+            min-height: 90vh;
             display: flex;
             align-items: center;
+            justify-content: center;
             overflow: hidden;
-            padding-top: calc(var(--nav-height) + 20px);
+            padding-top: var(--nav-height);
             padding-bottom: 80px;
         }
         
+        /* Background Collage Styling */
+        .hero-bg-collage {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+            overflow: hidden; /* Prevent scrollbars from tilted images */
+        }
+
+        .collage-img {
+            position: absolute;
+            width: 320px;
+            opacity: 0; /* Start hidden for animation */
+            border-radius: 12px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            /* Removed grayscale, increased visibility */
+            transition: all 1s ease-out;
+        }
+
+        /* Animation entry for images - End state opacity increased to 0.7 */
+        .collage-img { animation: floatInSimple 1.5s ease-out forwards; }
+        
+        @keyframes floatInSimple {
+            to { opacity: 0.7; }
+        }
+
+        /* Responsive Background Image Handling */
+        .collage-img {
+            width: 250px; /* Increased size on mobile */
+            filter: drop-shadow(0 10px 20px rgba(0,0,0,0.5)); /* Make them pop */
+        }
+
+        .img-left {
+            top: 10%;
+            left: -30px; /* Pulled closer to center (was -60px) */
+            transform: rotate(-8deg);
+            z-index: 0;
+        }
+
+        .img-right {
+            bottom: 15%;
+            right: -30px; /* Pulled closer to center (was -60px) */
+            transform: rotate(8deg);
+            z-index: 0;
+        }
+
+        /* Enhanced Overlay - Minimal blocking */
+        .hero-overlay-gradient {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            /* Combined Gradients:
+               1. Radial: Vignette for focus
+               2. Linear: Hard fade at the bottom to blend seamlessly with the next section
+            */
+            background: 
+                radial-gradient(circle at center, var(--bg-body) 10%, rgba(5,5,5,0.4) 50%, transparent 100%),
+                linear-gradient(to bottom, transparent 85%, var(--bg-body) 100%);
+            z-index: 1;
+        }
+
+        /* Content Styling */
         .hero-container {
-            display: grid;
-            grid-template-columns: 1.1fr 0.9fr; /* Teks sedikit lebih lebar */
-            align-items: center;
-            gap: 40px; /* Gap dikurangi agar menyatu */
-            width: 100%;
             position: relative;
-            z-index: 2;
+            z-index: 2; /* Text clearly above everything */
+            width: 100%;
+            display: flex;
+            justify-content: center;
         }
 
+        /* Add text shadow to ensure readability since background is now brighter */
+        .hero-title, .hero-subtitle, .hero-cta {
+             text-shadow: 0 2px 20px rgba(0,0,0,0.9);
+        }
+        
         .hero-content {
-            padding-right: 20px;
-        }
-
-        .hero-title {
-            font-size: clamp(3rem, 5vw, 4.5rem); /* Skala responsif besar */
-            font-weight: 800;
-            margin-bottom: 24px;
-            line-height: 1.1;
-            letter-spacing: -1px;
-        }
-
-        .hero-subtitle {
-            font-size: clamp(1.1rem, 2vw, 1.35rem); /* Teks lebih besar */
-            color: var(--text-muted);
-            max-width: 90%;
-            margin-bottom: 40px;
-            line-height: 1.7;
+             background: radial-gradient(circle, rgba(0,0,0,0.6) 0%, transparent 70%); /* Local text backdrop */
+             padding: 40px;
+             border-radius: 50%; /* Soft edge backdrop */
+             text-align: center;
+             max-width: 850px;
+             margin: 0 auto;
         }
 
         .hero-cta {
             display: flex;
-            gap: 15px; /* Jarak horizontal dan vertikal */
-            flex-wrap: wrap; /* Izinkan tombol turun ke bawah jika sempit */
-        }
-
-        .hero-image {
-            display: flex;
             justify-content: center;
-            align-items: center;
-            position: relative;
-        }
-
-        /* Lingkaran dekoratif di belakang HP */
-        .hero-image::before {
-            content: '';
-            position: absolute;
-            width: 80%;
-            height: 80%;
-            background: radial-gradient(circle, rgba(0, 255, 157, 0.1) 0%, transparent 70%);
-            filter: blur(40px);
-            z-index: -1;
-            animation: pulseGlow 4s ease-in-out infinite alternate;
-        }
-
-        @keyframes pulseGlow {
-            0% { transform: scale(0.9); opacity: 0.5; }
-            100% { transform: scale(1.1); opacity: 0.8; }
-        }
-
-        .hero-image img {
+            gap: 20px;
+            flex-wrap: wrap;
             width: 100%;
-            max-width: 180px; /* Diperkecil dari 400px */
-            height: auto;
-            object-fit: contain;
-            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.5));
-            animation: float 6s ease-in-out infinite;
+            margin-top: 30px;
         }
 
-        @media (min-width: 1600px) {
-            .hero-image img {
-                max-width: 260px; /* Diperkecil dari 500px */
+        /* Mobile specific spacing for buttons when stacked */
+        @media (max-width: 600px) {
+            .hero-cta {
+                flex-direction: column;
+                align-items: center; /* Ensures items are centered horizontally */
+                gap: 15px;
+            }
+            .hero-cta .btn {
+                width: auto; /* Let content dictate width, or use a fixed small width */
+                min-width: 200px; /* Minimum width for consistency */
+                max-width: 80%; /* Prevent touching edges */
+                margin: 0 auto; /* Explicit centering */
+                padding: 12px 24px; /* Slightly smaller padding */
+                font-size: 0.95rem; /* Slightly smaller text */
             }
         }
 
-        @keyframes float {
-            0% { transform: translateY(0); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0); }
+        /* Desktop Adjustments */
+        @media (min-width: 768px) {
+            .collage-img { width: 450px; }
+            .img-left { left: 0px; top: 10%; transform: rotate(-15deg); }
+            .img-right { right: 0px; bottom: 5%; transform: rotate(15deg); }
+            
+            .hero-overlay-gradient {
+                 background: radial-gradient(circle at center, var(--bg-body) 20%, rgba(5,5,5,0.5) 60%, transparent 100%);
+            }
+            
+            .hero-content {
+                 background: none; /* Not needed as much on desktop where images are on sides */
+                 padding: 0 20px;
+            }
+        }
+
+        /* Responsive Background Image Handling */
+        /* Mobile Default: Position them away from center to avoid overlap */
+        .collage-img {
+            width: 220px; /* Smaller on mobile */
+        }
+
+        .img-left {
+            top: 5%;
+            left: -60px; /* Push further out */
+            transform: rotate(-10deg);
+        }
+
+        .img-right {
+            bottom: 5%;
+            right: -60px; /* Push further out */
+            transform: rotate(10deg);
+        }
+
+        /* Desktop Adjustments */
+        @media (min-width: 768px) {
+            .collage-img { width: 400px; }
+            .img-left { left: -40px; top: 10%; transform: rotate(-15deg); }
+            .img-right { right: -40px; bottom: 5%; transform: rotate(15deg); }
+            
+            .hero-overlay-gradient {
+                 /* Slightly wider protection on desktop */
+                 background: radial-gradient(circle at center, var(--bg-body) 30%, rgba(5,5,5,0.6) 65%, transparent 100%);
+            }
+        }
+
+        @media (min-width: 1200px) {
+            .collage-img { width: 500px; }
+            .img-left { left: 5%; top: 10%; transform: rotate(-12deg); }
+            .img-right { right: 5%; bottom: 10%; transform: rotate(12deg); }
         }
 
         /* Section Feature Preview */
