@@ -174,6 +174,9 @@ function createDeviceElements(devices) {
         element.dataset.supportGroup = device.support_group || '';
         element.dataset.plingId = device.pling_id || ''; // Store Pling ID
         
+        // Store forum/support URL from updates.json
+        element.dataset.forumUrl = (buildData && buildData.forum) ? buildData.forum : '';
+        
         // Store all variants raw for the modal to process
         element.dataset.variants = (buildData && buildData.variants) ? JSON.stringify(buildData.variants) : '{}';
         
@@ -328,6 +331,7 @@ function initModalLogic() {
     const deviceName = deviceCard.dataset.deviceName;
     const maintainer = deviceCard.dataset.maintainer;
     const plingId = deviceCard.dataset.plingId;
+    const forumUrl = deviceCard.dataset.forumUrl; // Retrieve forum URL
     const variants = deviceCard.dataset.variants ? JSON.parse(deviceCard.dataset.variants) : {};
     
     // Check if any variants exist
@@ -343,7 +347,28 @@ function initModalLogic() {
     // Build Modal Content
     let content = `
         <h2 style="margin-bottom: 5px;">${deviceName}</h2>
-        <p style="color: var(--text-muted); margin-bottom: 20px;">${codename} • by ${maintainer}</p>
+        <div style="color: var(--text-muted); margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
+            <span>${codename} • by ${maintainer}</span>
+            ${forumUrl ? `
+            <a href="${forumUrl}" target="_blank" style="
+                display: inline-flex; 
+                align-items: center; 
+                justify-content: center; 
+                padding: 4px 12px;
+                background: rgba(0, 136, 204, 0.15); 
+                color: #0088cc; 
+                border: 1px solid rgba(0, 136, 204, 0.3);
+                border-radius: 20px; 
+                font-size: 0.85rem; 
+                text-decoration: none; 
+                font-weight: 600;
+                transition: all 0.2s;"
+                onmouseover="this.style.background='rgba(0, 136, 204, 1)'; this.style.color='#fff'" 
+                onmouseout="this.style.background='rgba(0, 136, 204, 0.15)'; this.style.color='#0088cc'"
+                title="Join Support Group">
+                <i class="fab fa-telegram-plane" style="margin-right: 6px;"></i> Support
+            </a>` : ''}
+        </div>
         
         <!-- Main Download Action -->
         <div style="margin-bottom: 30px; text-align: center;">
