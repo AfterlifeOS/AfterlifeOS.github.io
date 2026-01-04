@@ -66,10 +66,10 @@
 /* --- Global Background Texture --- */
 body {
     background-color: var(--bg-body);
-    /* Grid texture halus */
+    /* Grid texture more visible throughout the page */
     background-image: 
-        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+        linear-gradient(rgba(0, 255, 157, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 157, 0.07) 1px, transparent 1px);
     background-size: 50px 50px;
     background-position: center top;
 }
@@ -143,7 +143,7 @@ body {
 /* --- Components: Navbar --- */
 .navbar {
     height: var(--nav-height);
-    background: rgba(5, 5, 5, 0.85); /* Sedikit lebih gelap */
+    background: rgba(5, 5, 5, 0.85); /* Slightly darker */
     backdrop-filter: blur(12px);
     position: fixed;
     top: 0;
@@ -249,10 +249,10 @@ body {
 /* --- High Resolution Scaling --- */
 @media (min-width: 1600px) {
     html {
-        font-size: 18px; /* Menaikkan base font size agar semua elemen membesar */
+        font-size: 18px; /* Increase base font size so all elements scale up */
     }
     .container {
-        max-width: 1600px; /* Container lebih lebar untuk layar 4K */
+        max-width: 1600px; /* Wider container for 4K screens */
     }
     .section {
         padding: 100px 0;
