@@ -49,6 +49,9 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.animate-on-scroll').forEach(el => {
         observer.observe(el);
     });
+
+    // Initialize Lightbox
+    initLightbox();
 });
 
 function generateSocialLinks(socials) {
@@ -67,4 +70,70 @@ function generateSocialLinks(socials) {
 
         return `<a href="${url}" target="_blank" style="color: ${color};"><i class="${iconClass}"></i></a>`;
     }).join('');
+}
+
+function initLightbox() {
+    // 1. Create Lightbox Elements if they don't exist
+    if (!document.getElementById('lightbox')) {
+        const lightbox = document.createElement('div');
+        lightbox.id = 'lightbox';
+        lightbox.className = 'lightbox-overlay';
+        lightbox.innerHTML = `
+            <div class="lightbox-close">&times;</div>
+            <div class="lightbox-content">
+                <img src="" alt="Preview" class="lightbox-img">
+            </div>
+        `;
+        document.body.appendChild(lightbox);
+    }
+
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = lightbox.querySelector('.lightbox-img');
+    const closeBtn = lightbox.querySelector('.lightbox-close');
+
+    // 2. Add Event Listeners to Images
+    // Targeting images in the screenshot scroller and any other potential galleries
+    const images = document.querySelectorAll('.screenshot-scroller img, .content-gallery img');
+
+    images.forEach(img => {
+        img.style.cursor = 'zoom-in'; // UX Hint
+        img.addEventListener('click', (e) => {
+            e.stopPropagation(); // Prevent interfering with swipe logic
+            lightboxImg.src = img.src;
+            lightboxImg.alt = img.alt;
+            
+            lightbox.style.display = 'flex';
+            // Slight delay to allow display:flex to apply before adding active class for opacity transition
+            setTimeout(() => {
+                lightbox.classList.add('active');
+            }, 10);
+            
+            document.body.style.overflow = 'hidden'; // Disable scroll
+        });
+    });
+
+    // 3. Close Logic
+    const closeLightbox = () => {
+        lightbox.classList.remove('active');
+        setTimeout(() => {
+            lightbox.style.display = 'none';
+            lightboxImg.src = ''; // Clear src
+            document.body.style.overflow = ''; // Enable scroll
+        }, 300); // Match CSS transition
+    };
+
+    closeBtn.addEventListener('click', closeLightbox);
+    
+    lightbox.addEventListener('click', (e) => {
+        if (e.target === lightbox || e.target.classList.contains('lightbox-content')) {
+            closeLightbox();
+        }
+    });
+
+    // Close on Escape key
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && lightbox.classList.contains('active')) {
+            closeLightbox();
+        }
+    });
 }
