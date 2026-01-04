@@ -175,17 +175,19 @@ body {
     padding: 10px;
 }
 
-/* --- Components: Navbar --- */
+/* --- Components: Navbar (Main) --- */
 .navbar {
     height: var(--nav-height);
-    background: rgba(5, 5, 5, 0.85); /* Slightly darker */
-    backdrop-filter: blur(12px);
+    background: rgba(10, 10, 10, 0.7); /* More transparent for glass effect */
+    backdrop-filter: blur(20px) saturate(180%); /* Premium glass effect */
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
     z-index: 1000;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08); /* Subtle border */
+    transition: all 0.3s ease;
 }
 
 .nav-container {
@@ -196,32 +198,77 @@ body {
 }
 
 .nav-logo {
-    font-size: 1.6rem;
-    font-weight: 800;
+    font-size: 1.5rem;
+    font-weight: 700;
     letter-spacing: -0.5px;
+    position: relative;
+    z-index: 1002;
+    text-decoration: none;
 }
 
 .nav-links {
     display: flex;
+    align-items: center;
     gap: 32px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
 
-.nav-links a {
+/* Modern Link Style - Minimalist Hover */
+.nav-links li a {
     color: var(--text-muted);
     font-weight: 500;
-    font-size: 1rem;
-    transition: color 0.3s;
+    font-size: 0.95rem;
+    transition: color 0.3s ease;
+    text-decoration: none;
+    position: relative;
+    padding: 5px 0;
 }
 
-.nav-links a:hover, .nav-links a.active {
-    color: var(--color-primary);
+.nav-links li a:not(.btn):hover,
+.nav-links li a:not(.btn).active {
+    color: #fff;
+}
+
+/* Animated Underline for Links */
+.nav-links li a:not(.btn)::after {
+    content: '';
+    position: absolute;
+    width: 0;
+    height: 2px;
+    bottom: 0;
+    left: 50%;
+    background-color: var(--color-primary);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform: translateX(-50%);
+    opacity: 0;
+    border-radius: 2px;
+}
+
+.nav-links li a:not(.btn):hover::after,
+.nav-links li a:not(.btn).active::after {
+    width: 100%;
+    opacity: 1;
+}
+
+/* Specific button overrides within nav */
+.nav-links .btn {
+    padding: 8px 20px; /* Smaller than hero buttons */
+    font-size: 0.9rem;
 }
 
 .mobile-toggle {
     display: none;
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     color: var(--text-main);
     cursor: pointer;
+    z-index: 1002;
+    transition: transform 0.3s ease;
+}
+
+.mobile-toggle:active {
+    transform: scale(0.9);
 }
 
 /* --- Components: Footer --- */
@@ -281,55 +328,155 @@ body {
     border-color: rgba(0, 255, 157, 0.3);
 }
 
-/* --- High Resolution Scaling --- */
-@media (min-width: 1600px) {
-    html {
-        font-size: 18px; /* Increase base font size so all elements scale up */
-    }
-    .container {
-        max-width: 1600px; /* Wider container for 4K screens */
-    }
-    .section {
-        padding: 100px 0;
-    }
-}
+/* --- Filter Selects --- */
 
-@media (min-width: 2200px) {
-    html {
-        font-size: 20px; 
-    }
-    .container {
-        max-width: 1800px;
-    }
-}
 
-/* --- Responsive Mobile --- */
+/* --- Responsive Mobile: Floating Command Center --- */
 @media (max-width: 900px) {
+    /* Top Bar: Clean, Logo Only */
+    .navbar {
+        background: transparent !important;
+        backdrop-filter: none !important;
+        -webkit-backdrop-filter: none !important;
+        border-bottom: none !important;
+        pointer-events: none;
+        height: auto;
+        padding-top: 15px; /* Align container */
+        display: flex;
+        justify-content: space-between; /* Space between Logo and Toggle */
+        align-items: flex-start;
+    }
+
+    .nav-logo {
+        pointer-events: auto;
+        /* Smaller Glass Capsule */
+        background: rgba(8, 15, 15, 0.6);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        padding: 6px 16px; /* Reduced padding */
+        border-radius: 50px;
+        border: 1px solid rgba(0, 255, 157, 0.15);
+        margin-left: 10px; /* Closer to left edge */
+        
+        /* Typography */
+        font-size: 0.95rem; /* Reduced font size */
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        text-transform: uppercase;
+        
+        /* Shimmer Animation */
+        background-image: linear-gradient(
+            110deg,
+            #00e5ff 20%,
+            #ffffff 45%,
+            #00e5ff 55%,
+            #008080 80%
+        );
+        background-size: 200% auto;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        color: transparent;
+        
+        animation: logoShine 5s linear infinite;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    }
+
+    /* The Toggle Button - Moved to Top Right */
+    .mobile-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative; /* Relative to navbar container */
+        top: auto;
+        left: auto;
+        right: auto;
+        bottom: auto;
+        transform: none;
+        
+        margin-right: 10px; /* Align with right edge similar to logo left */
+        
+        width: 38px; /* Matching visual height of logo */
+        height: 38px;
+        
+        background: rgba(8, 15, 15, 0.6);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(0, 255, 157, 0.15);
+        border-radius: 50%; /* Circle shape */
+        
+        box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        z-index: 2000;
+        pointer-events: auto;
+        transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        color: #00e5ff; /* Cyan Icon */
+    }
+
+    .mobile-toggle:active {
+        transform: scale(0.9);
+        background: rgba(0, 255, 157, 0.1);
+    }
+    
+    .mobile-toggle i {
+        font-size: 1.1rem; /* Smaller icon */
+        transition: transform 0.3s;
+    }
+
+    /* The Menu - Floating from Top */
     .nav-links {
         position: fixed;
-        top: var(--nav-height);
-        left: 0;
-        right: 0;
-        background: var(--bg-body);
+        top: 70px; /* Below the top bar */
+        left: 20px;
+        right: 20px;
+        bottom: auto; /* Reset bottom */
+        height: auto;
+        
+        background: rgba(15, 15, 15, 0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 24px;
+        
         flex-direction: column;
-        padding: 30px;
-        gap: 24px;
-        border-bottom: var(--border-subtle);
-        transform: translateY(-150%);
-        transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
-        box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        justify-content: center;
+        align-items: center;
+        padding: 25px;
+        gap: 15px;
+        
+        transform: translateY(-20px) scale(0.95); /* Slide down effect */
+        opacity: 0;
+        pointer-events: none;
+        box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        z-index: 1999;
     }
 
     .nav-links.active {
-        transform: translateY(0);
+        transform: translateY(0) scale(1);
+        opacity: 1;
+        pointer-events: auto;
     }
 
-    .mobile-toggle {
+    /* Adjust links inside the card */
+    .nav-links li {
+        width: 100%;
+        text-align: center;
+    }
+
+    .nav-links li a {
         display: block;
+        font-size: 1rem;
+        padding: 10px;
+        color: var(--text-main);
+    }
+    
+    .nav-links .btn {
+        width: 100%;
+        box-sizing: border-box;
     }
     
     .section {
-        padding: 60px 0;
+        padding: 80px 0 60px;
     }
 }
 
@@ -621,21 +768,25 @@ body {
     transform: translateY(-3px);
 }
 
-/* --- Lightbox --- */
+/* --- Lightbox (Modern Glass) --- */
 .lightbox-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.95);
+    /* Dark blur background instead of solid black */
+    background: rgba(5, 5, 5, 0.85);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
     z-index: 3000;
     display: none;
     justify-content: center;
     align-items: center;
     opacity: 0;
-    transition: opacity 0.3s ease;
-    backdrop-filter: blur(10px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 .lightbox-overlay.active {
@@ -645,48 +796,62 @@ body {
 
 .lightbox-content {
     position: relative;
-    max-width: 90vw;
-    max-height: 90vh;
-    box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
-    border-radius: 8px;
-    overflow: hidden;
+    max-width: 100%;
+    max-height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Spring animation for content */
+    transform: scale(0.9) translateY(20px);
+    transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); /* Bouncy spring effect */
+}
+
+.lightbox-overlay.active .lightbox-content {
+    transform: scale(1) translateY(0);
 }
 
 .lightbox-img {
     max-width: 100%;
-    max-height: 90vh;
+    max-height: 85vh;
     display: block;
     object-fit: contain;
-    transform: scale(0.9);
-    transition: transform 0.3s ease;
-}
-
-.lightbox-overlay.active .lightbox-img {
-    transform: scale(1);
+    /* Clean look: No border, no shadow */
+    border-radius: 0;
+    box-shadow: none;
+    border: none;
 }
 
 .lightbox-close {
     position: absolute;
     top: 20px;
-    right: 30px;
+    right: 20px;
     color: #fff;
-    font-size: 2.5rem;
-    cursor: pointer;
-    z-index: 3010;
-    transition: all 0.3s;
-    background: rgba(0,0,0,0.5);
-    width: 50px;
-    height: 50px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgba(255,255,255,0.2);
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    z-index: 3010;
 }
 
 .lightbox-close:hover {
-    color: var(--color-primary);
-    transform: rotate(90deg);
-    background: rgba(0,0,0,0.8);
-    border-color: var(--color-primary);
+    background: rgba(255, 50, 50, 0.2);
+    border-color: rgba(255, 50, 50, 0.4);
+    color: #ff4d4d;
+    transform: rotate(90deg) scale(1.1);
+}
+
+.lightbox-close::before {
+    content: '×'; /* Custom thin cross */
+    font-family: sans-serif;
+    font-weight: 300;
+    line-height: 1;
+    margin-top: -2px;
 }

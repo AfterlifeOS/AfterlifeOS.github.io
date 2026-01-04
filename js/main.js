@@ -19,15 +19,21 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Simple scroll effect for navbar
+    // Simple scroll effect for navbar (Desktop Only)
     const navbar = document.querySelector('.navbar');
     window.addEventListener('scroll', () => {
-        if (window.scrollY > 50) {
-            navbar.style.background = 'rgba(5, 5, 5, 0.95)';
-            navbar.style.boxShadow = '0 4px 20px rgba(0,0,0,0.5)';
+        if (window.innerWidth > 900) {
+            if (window.scrollY > 50) {
+                navbar.style.background = 'rgba(5, 5, 5, 0.95)';
+                navbar.style.boxShadow = '0 4px 20px rgba(0,0,0,0.5)';
+            } else {
+                navbar.style.background = 'rgba(10, 10, 10, 0.7)'; // Match new CSS default
+                navbar.style.boxShadow = 'none';
+            }
         } else {
-            navbar.style.background = 'rgba(5, 5, 5, 0.8)';
-            navbar.style.boxShadow = 'none';
+            // Mobile: Ensure clear background to respect CSS override
+            navbar.style.background = '';
+            navbar.style.boxShadow = '';
         }
     });
 
