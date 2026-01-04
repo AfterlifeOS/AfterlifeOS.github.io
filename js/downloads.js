@@ -61,6 +61,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                fragment.appendChild(element);
              });
              grid.appendChild(fragment);
+
+             // Attempt to detect and highlight user's device
+             detectAndHighlightDevice(processedDevices, grid);
           }
       }
 
@@ -490,7 +493,7 @@ function formatChangelog(text) {
   if (!text) return '';
   
   // 1. Sanitize HTML to prevent XSS
-  let formatted = text.replace(/[&<>"']/g, function(m) {
+  let formatted = text.replace(/[&<>'"']/g, function(m) {
     return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
   });
 
@@ -504,7 +507,7 @@ function formatChangelog(text) {
   formatted = formatted.replace(/^###\s+(.*)$/gm, '<div style="font-size: 1.1rem; font-weight: bold; margin-top: 15px; margin-bottom: 5px; color: var(--text-main);">$1</div>');
 
   // 5. Convert --- to Separator
-  formatted = formatted.replace(/^---+$/gm, '<hr style="border: 0; border-top: 1px dashed var(--text-muted); margin: 20px 0; opacity: 0.3;">');
+  formatted = formatted.replace(/^---+\s*$/gm, '<hr style="border: 0; border-top: 1px dashed var(--text-muted); margin: 20px 0; opacity: 0.3;">');
 
   // 6. Handle Bullet Points (-) with Hanging Indent
   formatted = formatted.replace(/^-\s+(.*)$/gm, `
@@ -525,4 +528,68 @@ function formatChangelog(text) {
   formatted = formatted.replace(/<hr(.*?)>(<br>\s*)+/g, '<hr$1>');
 
   return formatted;
+}
+
+// ---------------------------
+// Auto Device Detection Logic
+// ---------------------------
+function detectAndHighlightDevice(devices, grid) {
+  if (!navigator.userAgent) return;
+  const ua = navigator.userAgent.toLowerCase();
+
+  // Try to find a match
+  // 1. Check if codename exists strictly in UA (rare but accurate)
+  // 2. Check if device name parts exist in UA (e.g. "Pixel 5")
+  
+  const matchedDevice = devices.find(device => {
+      // Clean checks
+      const code = device.codename.toLowerCase();
+      const name = device.name.toLowerCase();
+      
+      // Strict codename check (avoid short strings being false positives)
+      if (code.length > 3 && ua.includes(code)) return true;
+      
+      // Name check: Check if key parts of name are in UA
+      // Example: "Samsung Galaxy S20 FE" -> check if "S20 FE" or "Galaxy S20" is in UA
+      // Simple include for now
+      return ua.includes(name);
+  });
+
+  if (matchedDevice) {
+      // Find the card in the DOM
+      const card = grid.querySelector(`.device-card[data-codename="${matchedDevice.codename}"]`);
+      
+      if (card) {
+          // Visual Enhancements
+          card.style.borderColor = 'var(--color-primary)';
+          card.style.boxShadow = '0 0 30px rgba(0, 255, 157, 0.2)';
+          card.style.order = '-1'; // Flexbox trick to move to top!
+          
+          // Add "Your Device" Badge inside the card image area or top
+          const badge = document.createElement('div');
+          badge.innerHTML = '<i class="fas fa-mobile-alt"></i> Your Device';
+          badge.style.cssText = `
+              position: absolute;
+              top: 10px;
+              right: 10px;
+              background: var(--color-primary);
+              color: #000;
+              padding: 5px 10px;
+              border-radius: 20px;
+              font-size: 0.8rem;
+              font-weight: bold;
+              box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+              z-index: 10;
+          `;
+          
+          // Ensure card is relative for absolute positioning
+          card.style.position = 'relative';
+          card.appendChild(badge);
+          
+          // Optional: Add a "Suggested" header above the grid?
+          // Since we are using order: -1, it stays in the grid.
+          // To add a header, we'd need to restructure the DOM. 
+          // For now, the visual highlight + top position is sufficient and clean.
+      }
+  }
 }
