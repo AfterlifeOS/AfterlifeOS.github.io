@@ -47,9 +47,21 @@
                 </div>
             </div>
 
-            <!-- Brand Filters -->
-            <div class="brand-filters filter-container" style="display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin-bottom: 40px;">
-                <!-- Populated by JS -->
+            <!-- Filters Container -->
+            <div class="filter-container" style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-bottom: 30px;">
+                <div class="select-wrapper">
+                    <select id="statusFilter" class="filter-select">
+                        <option value="all">All Status</option>
+                        <option value="active" selected>Active Builds</option>
+                        <option value="inactive">Inactive Builds</option>
+                    </select>
+                </div>
+                <div class="select-wrapper">
+                    <select id="brandFilter" class="filter-select">
+                        <option value="all">All Brands</option>
+                        <!-- Brands populated dynamically -->
+                    </select>
+                </div>
             </div>
 
             <!-- Downloads Grid -->

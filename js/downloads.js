@@ -1,5 +1,7 @@
 const fetchCache = new Map();
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+// Global set to store discovered brands from updates.json
+const discoveredBrands = new Set();
 
 async function cachedFetch(url, options = {}) {
   const cacheKey = `${url}_${JSON.stringify(options)}`;
@@ -44,10 +46,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
     
     const deviceData = await deviceInfoRes.json();
-    // processDevices expects an array. In our new devices.json, it's { "devices": [...] }
     const processedDevices = processDevices(deviceData.devices || []);
     
     const loadDevices = async () => {
+      // Clear existing brands before loading
+      discoveredBrands.clear();
+      updateBrandFilterOptions();
+
       const deviceElements = await createDeviceElements(processedDevices);
       
       if(grid) {
@@ -57,7 +62,16 @@ document.addEventListener('DOMContentLoaded', async () => {
              grid.innerHTML = '<div style="grid-column: 1/-1; text-align: center;"><p>No devices found.</p></div>';
           } else {
              deviceElements.forEach(element => {
-               element.style.display = 'block';
+               // Initial visibility check based on default filters (Active only)
+               const status = element.dataset.status;
+               const statusFilter = document.getElementById('statusFilter').value;
+               
+               if (statusFilter === 'all' || status === statusFilter) {
+                   element.style.display = 'block';
+               } else {
+                   element.style.display = 'none';
+               }
+               
                fragment.appendChild(element);
              });
              grid.appendChild(fragment);
@@ -94,26 +108,22 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 function processDevices(devices) {
   return devices.map(device => {
-    // Our generate_devices_json.py creates 'name', 'codename', 'brand', 'maintainer'
-    const brandName = getDeviceBrand(device.name); // Using name for brand detection if brand field is generic
-    const originalCodename = device.codename;
+    // Default brand from devices.json (fallback)
+    const brandName = getDeviceBrand(device.name); 
     
-    // Use the external image URL provided in the JSON (merged from device_images.json)
-    // If empty, it will fall back to onerror in HTML
     const imageUrl = device.image_url || '';
-    
     const statusValue = device.status || 'Active';
     const isActive = String(statusValue).toLowerCase() === 'active';
     
     return {
       name: device.name,
       codename: device.codename,
-      brand: device.brand || brandName,
+      brand: device.brand || brandName, // This is the fallback brand
       maintainer: device.maintainer,
-      github_username: device.github_username || device.maintainer.split(' ')[0], // simple heuristic
+      github_username: device.github_username || device.maintainer.split(' ')[0],
       support_group: device.support_group || '',
       image_url: imageUrl,
-      pling_id: device.pling_id, // Added missing field
+      pling_id: device.pling_id,
       status: isActive ? 'active' : 'inactive'
     };
   });
@@ -129,29 +139,44 @@ function createDeviceElements(devices) {
         usedCodenames.add(device.codename);
 
         const element = document.createElement('div');
-        element.className = 'device-card'; // Matches style.css
-        element.dataset.brand = device.brand.toLowerCase();
-
-        // Fetch ONE updates.json containing all variants
+        element.className = 'device-card';
+        
+        // Fetch updates.json to get variants AND real OEM
         const buildData = await fetchUpdateJson(device.codename);
         
+        // Determine Brand/OEM from updates.json if available, else fallback
+        let finalBrand = device.brand;
+        if (buildData && buildData.oem) {
+            finalBrand = buildData.oem;
+        }
+        
+        // Register this brand into our global set and update dropdown
+        if (finalBrand) {
+            // Capitalize first letter for consistency
+            const formattedBrand = finalBrand.charAt(0).toUpperCase() + finalBrand.slice(1);
+            if (!discoveredBrands.has(formattedBrand)) {
+                discoveredBrands.add(formattedBrand);
+                updateBrandFilterOptions(); // Update UI immediately when new brand found
+            }
+            element.dataset.brand = formattedBrand; // Store formatted brand for filtering
+        } else {
+            element.dataset.brand = 'Other';
+        }
+
+        element.dataset.status = device.status; // Store status 'active' or 'inactive'
+
         let gms = null;
         let vanilla = null;
-        let gmsLabel = 'GApps'; // Default label
         
         if (buildData && buildData.variants) {
             // Priority logic for GApps variants
             if (buildData.variants.gapps) {
                 gms = buildData.variants.gapps;
-                gmsLabel = 'GApps';
             } else if (buildData.variants.basicgapps) {
                 gms = buildData.variants.basicgapps;
-                gmsLabel = 'BasicGApps';
             } else if (buildData.variants.coregapps) {
                 gms = buildData.variants.coregapps;
-                gmsLabel = 'CoreGApps';
             }
-            
             vanilla = buildData.variants.vanilla || null;
         }
 
@@ -172,12 +197,9 @@ function createDeviceElements(devices) {
         element.dataset.githubUsername = device.github_username;
         element.dataset.imageUrl = imageUrl;
         element.dataset.supportGroup = device.support_group || '';
-        element.dataset.plingId = device.pling_id || ''; // Store Pling ID
+        element.dataset.plingId = device.pling_id || '';
         
-        // Store forum/support URL from updates.json
         element.dataset.forumUrl = (buildData && buildData.forum) ? buildData.forum : '';
-        
-        // Store all variants raw for the modal to process
         element.dataset.variants = (buildData && buildData.variants) ? JSON.stringify(buildData.variants) : '{}';
         
         element.innerHTML = `
@@ -212,7 +234,40 @@ function createDeviceElements(devices) {
   ).then(elements => elements.filter(Boolean));
 }
 
-// Replaces fetchFlavorData. Fetches the single updates.json
+function updateBrandFilterOptions() {
+    const brandSelect = document.getElementById('brandFilter');
+    if (!brandSelect) return;
+
+    // Save current selection
+    const currentSelection = brandSelect.value;
+
+    // Clear existing options (except first "All Brands")
+    while (brandSelect.options.length > 1) {
+        brandSelect.remove(1);
+    }
+
+    // Sort brands alphabetically
+    const sortedBrands = Array.from(discoveredBrands).sort();
+
+    sortedBrands.forEach(brand => {
+        const option = document.createElement('option');
+        option.value = brand; // Use the brand string directly as value
+        option.textContent = brand;
+        brandSelect.appendChild(option);
+    });
+
+    // Restore selection if it still exists
+    if (currentSelection !== 'all' && discoveredBrands.has(currentSelection)) {
+        brandSelect.value = currentSelection;
+    }
+}
+
+// ... (fetchUpdateJson, formatBytes, formatDate, renderVariantInfo, fetchDeviceChangelog, initModalLogic remain largely same) ...
+// Note: I will only replace the relevant filter/init functions below to save space if this was a partial replace, 
+// but since I'm using `replace` on the whole file content structure (implied by context), 
+// I must ensure I don't break the file structure. 
+// For safety, I'll continue the full logic replacement.
+
 async function fetchUpdateJson(codename) {
   try {
     const url = `https://raw.githubusercontent.com/AfterlifeOS/device_afterlife_ota/refs/heads/16/${codename}/updates.json`;
@@ -227,10 +282,8 @@ async function fetchUpdateJson(codename) {
 
 function formatBytes(bytes, decimals = 1) {
     if (!bytes) return 'Unknown Size';
-    // If bytes is a string (some JSONs have string sizes), try parsing it
     const numBytes = typeof bytes === 'string' ? parseInt(bytes, 10) : bytes;
     if (isNaN(numBytes) || numBytes === 0) return '0 Bytes';
-
     const k = 1024;
     const dm = decimals < 0 ? 0 : decimals;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
@@ -249,80 +302,51 @@ function renderVariantInfo(variants) {
   if (!variants || Object.keys(variants).length === 0) {
       return '<p style="text-align: center; color: var(--text-muted);">No build details available.</p>';
   }
-
   let html = '<div class="variant-list" style="display: flex; flex-direction: column; gap: 15px;">';
-  
-  // Define display order and labels
-  const typeMap = {
-      'gapps': 'Full', // Changed from GApps to Full
-      'basicgapps': 'BasicGApps',
-      'coregapps': 'CoreGApps',
-      'vanilla': 'Vanilla'
-  };
-
-  // Iterate through keys to find available variants
+  const typeMap = { 'gapps': 'Full', 'basicgapps': 'BasicGApps', 'coregapps': 'CoreGApps', 'vanilla': 'Vanilla' };
   for (const [key, build] of Object.entries(variants)) {
       if (!build) continue;
-      
       const label = typeMap[key] || key.charAt(0).toUpperCase() + key.slice(1);
-      
       html += `
         <div class="variant-item" style="background: var(--bg-card); padding: 15px; border-radius: 8px; border: 1px solid var(--border-subtle);">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
                 <strong style="color: var(--color-primary); font-size: 1.1rem;">${label}</strong>
                 <span style="font-size: 0.8rem; background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 4px;">v${build.version}</span>
             </div>
-            
             <div style="font-size: 0.9rem; display: grid; grid-template-columns: 85px minmax(0, 1fr); gap: 5px; align-items: baseline;">
-                <span style="color: var(--text-muted);">Filename:</span>
-                <span style="word-break: break-all;">${build.filename}</span>
-                
-                <span style="color: var(--text-muted);">Size:</span>
-                <span>${formatBytes(build.size)}</span>
-                
-                <span style="color: var(--text-muted);">Date:</span>
-                <span>${formatDate(build.timestamp || build.datetime)}</span>
-                
-                <span style="color: var(--text-muted);">MD5:</span>
-                <span style="font-family: monospace; font-size: 0.85rem; word-break: break-all;">${build.md5}</span>
+                <span style="color: var(--text-muted);">Filename:</span><span style="word-break: break-all;">${build.filename}</span>
+                <span style="color: var(--text-muted);">Size:</span><span>${formatBytes(build.size)}</span>
+                <span style="color: var(--text-muted);">Date:</span><span>${formatDate(build.timestamp || build.datetime)}</span>
+                <span style="color: var(--text-muted);">MD5:</span><span style="font-family: monospace; font-size: 0.85rem; word-break: break-all;">${build.md5}</span>
             </div>
         </div>
       `;
   }
-  
   html += '</div>';
   return html;
 }
 
 async function fetchDeviceChangelog(codename) {
   try {
-    // Try plural 'changelogs.md' first (seen in devonf)
     const urlMdPlural = `https://raw.githubusercontent.com/AfterlifeOS/device_afterlife_ota/refs/heads/16/${codename}/changelogs.md`;
     const resMdPlural = await cachedFetch(urlMdPlural, { cache: 'default' });
     if (resMdPlural.ok) return await resMdPlural.text();
 
-    // Try singular 'changelog.md'
     const urlMd = `https://raw.githubusercontent.com/AfterlifeOS/device_afterlife_ota/refs/heads/16/${codename}/changelog.md`;
     const resMd = await cachedFetch(urlMd, { cache: 'default' });
     if (resMd.ok) return await resMd.text();
 
-    // Try text file 'changelog.txt'
     const urlTxt = `https://raw.githubusercontent.com/AfterlifeOS/device_afterlife_ota/refs/heads/16/${codename}/changelog.txt`;
     const resTxt = await cachedFetch(urlTxt, { cache: 'default' });
     if (resTxt.ok) return await resTxt.text();
-    
     return null;
-  } catch (error) {
-    return null;
-  }
+  } catch (error) { return null; }
 }
 
 function initModalLogic() {
   const modalOverlay = document.getElementById('modalOverlay');
   const modalBody = document.getElementById('modalBody');
   const closeModalBtn = document.getElementById('closeModalBtn');
-
-  // Event Delegation for Card Clicks
   document.querySelector('.downloads-grid')?.addEventListener('click', async (event) => {
     const deviceCard = event.target.closest('.device-card');
     if (!deviceCard) return;
@@ -331,84 +355,47 @@ function initModalLogic() {
     const deviceName = deviceCard.dataset.deviceName;
     const maintainer = deviceCard.dataset.maintainer;
     const plingId = deviceCard.dataset.plingId;
-    const forumUrl = deviceCard.dataset.forumUrl; // Retrieve forum URL
+    const forumUrl = deviceCard.dataset.forumUrl;
     const variants = deviceCard.dataset.variants ? JSON.parse(deviceCard.dataset.variants) : {};
     
-    // Check if any variants exist
-    const hasVariants = Object.keys(variants).length > 0;
-
-    if (!hasVariants && !plingId) {
+    if (Object.keys(variants).length === 0 && !plingId) {
       alert("No builds available for this device yet.");
       return;
     }
 
     const changelog = await fetchDeviceChangelog(codename);
     
-    // Build Modal Content
     let content = `
         <h2 style="margin-bottom: 5px;">${deviceName}</h2>
         <div style="color: var(--text-muted); margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
             <span>${codename} • by ${maintainer}</span>
             ${forumUrl ? `
-            <a href="${forumUrl}" target="_blank" style="
-                display: inline-flex; 
-                align-items: center; 
-                justify-content: center; 
-                padding: 4px 12px;
-                background: rgba(0, 136, 204, 0.15); 
-                color: #0088cc; 
-                border: 1px solid rgba(0, 136, 204, 0.3);
-                border-radius: 20px; 
-                font-size: 0.85rem; 
-                text-decoration: none; 
-                font-weight: 600;
-                transition: all 0.2s;"
-                onmouseover="this.style.background='rgba(0, 136, 204, 1)'; this.style.color='#fff'" 
-                onmouseout="this.style.background='rgba(0, 136, 204, 0.15)'; this.style.color='#0088cc'"
-                title="Join Support Group">
+            <a href="${forumUrl}" target="_blank" style="display: inline-flex; align-items: center; justify-content: center; padding: 4px 12px; background: rgba(0, 136, 204, 0.15); color: #0088cc; border: 1px solid rgba(0, 136, 204, 0.3); border-radius: 20px; font-size: 0.85rem; text-decoration: none; font-weight: 600; transition: all 0.2s;" onmouseover="this.style.background='rgba(0, 136, 204, 1)'; this.style.color='#fff'" onmouseout="this.style.background='rgba(0, 136, 204, 0.15)'; this.style.color='#0088cc'">
                 <i class="fab fa-telegram-plane" style="margin-right: 6px;"></i> Support
             </a>` : ''}
         </div>
         
-        <!-- Main Download Action -->
         <div style="margin-bottom: 30px; text-align: center;">
-            ${plingId ? 
-                `<a href="https://www.pling.com/p/${plingId}" target="_blank" class="btn btn-primary" style="padding: 12px 20px; font-size: 1.1rem; width: 100%; display: inline-block; max-width: 350px; margin: 0 auto; box-sizing: border-box;">
-                    <i class="fas fa-download"></i> Download from Pling
-                 </a>` : 
-                `<button disabled class="btn" style="opacity: 0.5; cursor: not-allowed; width: 100%; max-width: 350px;">Download link unavailable</button>`
-            }
+            ${plingId ? `<a href="https://www.pling.com/p/${plingId}" target="_blank" class="btn btn-primary" style="padding: 12px 20px; font-size: 1.1rem; width: 100%; display: inline-block; max-width: 350px; margin: 0 auto; box-sizing: border-box;"><i class="fas fa-download"></i> Download from Pling</a>` : `<button disabled class="btn" style="opacity: 0.5; cursor: not-allowed; width: 100%; max-width: 350px;">Download link unavailable</button>`}
         </div>
 
         <div class="modal-tabs">
             <button class="tab-btn active" data-target="builds">Build Details</button>
             ${changelog ? '<button class="tab-btn" data-target="changelog">Changelog</button>' : ''}
         </div>
-
-        <div id="view-builds">
-            ${renderVariantInfo(variants)}
-        </div>
-
-        ${changelog ? `
-            <div id="view-changelog" style="display: none; max-height: 300px; overflow-y: auto; background: var(--bg-surface); padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.9rem; line-height: 1.5;">
-                <div style="white-space: normal;">${formatChangelog(changelog)}</div>
-            </div>
-        ` : ''}
+        <div id="view-builds">${renderVariantInfo(variants)}</div>
+        ${changelog ? `<div id="view-changelog" style="display: none; max-height: 300px; overflow-y: auto; background: var(--bg-surface); padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.9rem; line-height: 1.5;"><div style="white-space: normal;">${formatChangelog(changelog)}</div></div>` : ''}
     `;
     
     modalBody.innerHTML = content;
-
-    // Modal Tab Logic
     const tabs = modalBody.querySelectorAll('.tab-btn');
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
             tabs.forEach(t => t.classList.remove('active'));
             tab.classList.add('active');
-
             const target = tab.dataset.target;
             const buildsView = modalBody.querySelector('#view-builds');
             const changelogView = modalBody.querySelector('#view-changelog');
-
             if(target === 'builds') {
                 buildsView.style.display = 'block';
                 if(changelogView) changelogView.style.display = 'none';
@@ -420,17 +407,13 @@ function initModalLogic() {
     });
 
     modalOverlay.style.display = 'flex';
-    setTimeout(() => {
-        modalOverlay.classList.add('active');
-    }, 10);
+    setTimeout(() => modalOverlay.classList.add('active'), 10);
     document.body.style.overflow = 'hidden';
   });
 
   const closeModal = () => {
     modalOverlay.classList.remove('active');
     modalOverlay.classList.add('closing');
-    
-    // Wait for animation to finish (300ms matches CSS transition)
     setTimeout(() => {
         modalOverlay.classList.remove('closing');
         modalOverlay.style.display = 'none';
@@ -438,11 +421,8 @@ function initModalLogic() {
         modalBody.innerHTML = '';
     }, 300);
   };
-
   closeModalBtn?.addEventListener('click', closeModal);
-  modalOverlay?.addEventListener('click', (e) => {
-    if (e.target === modalOverlay) closeModal();
-  });
+  modalOverlay?.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
 }
 
 function initSearch() {
@@ -451,17 +431,17 @@ function initSearch() {
 
   // 1. Event Listener for Input Changes
   searchInput.addEventListener('input', (e) => {
-    const query = e.target.value.toLowerCase();
-    filterDevices(query);
-    
-    // Update URL without reloading
-    const url = new URL(window.location);
-    if (query) {
-        url.searchParams.set('search', query);
-    } else {
-        url.searchParams.delete('search');
-    }
-    window.history.replaceState({}, '', url);
+      applyFilters();
+      
+      // Update URL with search query
+      const query = e.target.value;
+      const url = new URL(window.location);
+      if (query) {
+          url.searchParams.set('search', query);
+      } else {
+          url.searchParams.delete('search');
+      }
+      window.history.replaceState({}, '', url);
   });
 
   // 2. Check URL for existing search param on load
@@ -471,35 +451,50 @@ function initSearch() {
   if (searchParam) {
       searchInput.value = searchParam;
       // Trigger filtering immediately
-      filterDevices(searchParam.toLowerCase());
+      // We use a small timeout to ensure elements are likely rendered or applyFilters handles it
+      setTimeout(applyFilters, 100); 
   }
 }
 
-function filterDevices(query) {
-    const cards = document.querySelectorAll('.device-card');
-    let hasVisible = false;
+function initFilters() {
+    const statusFilter = document.getElementById('statusFilter');
+    const brandFilter = document.getElementById('brandFilter');
 
+    if (statusFilter) {
+        statusFilter.addEventListener('change', applyFilters);
+    }
+    if (brandFilter) {
+        brandFilter.addEventListener('change', applyFilters);
+    }
+}
+
+function applyFilters() {
+    const searchInput = document.getElementById('deviceSearch');
+    const statusFilter = document.getElementById('statusFilter');
+    const brandFilter = document.getElementById('brandFilter');
+
+    const searchQuery = searchInput ? searchInput.value.toLowerCase() : '';
+    const statusValue = statusFilter ? statusFilter.value : 'all';
+    const brandValue = brandFilter ? brandFilter.value : 'all';
+
+    const cards = document.querySelectorAll('.device-card');
+    
     cards.forEach(card => {
         const name = card.dataset.deviceName.toLowerCase();
         const codename = card.dataset.codename.toLowerCase();
-        // Check if query matches name or codename
-        if(name.includes(query) || codename.includes(query)) {
+        const cardStatus = card.dataset.status; // 'active' or 'inactive'
+        const cardBrand = card.dataset.brand;
+
+        let matchesSearch = name.includes(searchQuery) || codename.includes(searchQuery);
+        let matchesStatus = (statusValue === 'all') || (cardStatus === statusValue);
+        let matchesBrand = (brandValue === 'all') || (cardBrand === brandValue);
+
+        if (matchesSearch && matchesStatus && matchesBrand) {
             card.style.display = 'block';
-            hasVisible = true;
         } else {
             card.style.display = 'none';
         }
     });
-
-    // Optional: Handle "No results" state if needed
-    // const grid = document.querySelector('.downloads-grid');
-    // ...
-}
-
-function initFilters() {
-  const container = document.querySelector('.brand-filters');
-  if(!container) return;
-  // Filters can be populated here if needed
 }
 
 function getDeviceBrand(name) {
@@ -516,81 +511,42 @@ function getDeviceBrand(name) {
 
 function formatChangelog(text) {
   if (!text) return '';
-  
-  // 1. Sanitize HTML to prevent XSS
   let formatted = text.replace(/[&<>'"']/g, function(m) {
     return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
   });
-
-  // 2. Hide lines starting with single # and consume the following newline
   formatted = formatted.replace(/^#\s+.*\n?/gm, '');
-
-  // 3. Style ## (H2) - Large & Bold
   formatted = formatted.replace(/^##\s+(.*)$/gm, '<div style="font-size: 1.3rem; font-weight: bold; margin-top: 10px; margin-bottom: 10px; color: var(--color-primary); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">$1</div>');
-
-  // 4. Style ### (H3) - Medium & Bold
   formatted = formatted.replace(/^###\s+(.*)$/gm, '<div style="font-size: 1.1rem; font-weight: bold; margin-top: 15px; margin-bottom: 5px; color: var(--text-main);">$1</div>');
-
-  // 5. Convert --- to Separator
   formatted = formatted.replace(/^---+\s*$/gm, '<hr style="border: 0; border-top: 1px dashed var(--text-muted); margin: 20px 0; opacity: 0.3;">');
-
-  // 6. Handle Bullet Points (-) with Hanging Indent
   formatted = formatted.replace(/^-\s+(.*)$/gm, `
     <div style="display: flex; align-items: flex-start; margin-bottom: 1px;">
         <span style="flex-shrink: 0; margin-right: 10px; color: var(--text-muted); user-select: none;">-</span>
         <span>$1</span>
     </div>
   `);
-
-  // 7. Replace **text** with blue bold text (#64b5f6)
   formatted = formatted.replace(/\*\*(.*?)\*\*/g, '<span style="color: #64b5f6; font-weight: bold;">$1</span>');
-  
-  // 8. Handle remaining newlines (convert to <br>) for non-list/header text
   formatted = formatted.replace(/\n/g, '<br>');
-  
-  // Cleanup: Remove ALL <br> tags immediately following our block elements to prevent double spacing
   formatted = formatted.replace(/<\/div>(<br>\s*)+/g, '</div>');
   formatted = formatted.replace(/<hr(.*?)>(<br>\s*)+/g, '<hr$1>');
-
   return formatted;
 }
 
-// ---------------------------
-// Auto Device Detection Logic
-// ---------------------------
 function detectAndHighlightDevice(devices, grid) {
   if (!navigator.userAgent) return;
   const ua = navigator.userAgent.toLowerCase();
-
-  // Try to find a match
-  // 1. Check if codename exists strictly in UA (rare but accurate)
-  // 2. Check if device name parts exist in UA (e.g. "Pixel 5")
-  
   const matchedDevice = devices.find(device => {
-      // Clean checks
       const code = device.codename.toLowerCase();
       const name = device.name.toLowerCase();
-      
-      // Strict codename check (avoid short strings being false positives)
       if (code.length > 3 && ua.includes(code)) return true;
-      
-      // Name check: Check if key parts of name are in UA
-      // Example: "Samsung Galaxy S20 FE" -> check if "S20 FE" or "Galaxy S20" is in UA
-      // Simple include for now
       return ua.includes(name);
   });
 
   if (matchedDevice) {
-      // Find the card in the DOM
       const card = grid.querySelector(`.device-card[data-codename="${matchedDevice.codename}"]`);
-      
       if (card) {
-          // Visual Enhancements
           card.style.borderColor = 'var(--color-primary)';
           card.style.boxShadow = '0 0 30px rgba(0, 255, 157, 0.2)';
-          card.style.order = '-1'; // Flexbox trick to move to top!
-          
-          // Add "Your Device" Badge inside the card image area or top
+          card.style.order = '-1';
           const badge = document.createElement('div');
           badge.innerHTML = '<i class="fas fa-mobile-alt"></i> Your Device';
           badge.style.cssText = `
@@ -606,15 +562,8 @@ function detectAndHighlightDevice(devices, grid) {
               box-shadow: 0 4px 10px rgba(0,0,0,0.3);
               z-index: 10;
           `;
-          
-          // Ensure card is relative for absolute positioning
           card.style.position = 'relative';
           card.appendChild(badge);
-          
-          // Optional: Add a "Suggested" header above the grid?
-          // Since we are using order: -1, it stays in the grid.
-          // To add a header, we'd need to restructure the DOM. 
-          // For now, the visual highlight + top position is sufficient and clean.
       }
   }
 }

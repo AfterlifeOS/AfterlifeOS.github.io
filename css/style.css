@@ -136,8 +136,43 @@ body {
     color: var(--color-primary);
 }
 
-.btn-outline:hover {
-    background: rgba(0, 255, 157, 0.1);
+.filter-btn.active, .filter-btn:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+            background: rgba(0,255,157,0.1);
+        }
+
+/* --- Filter Selects --- */
+.filter-select {
+    background: var(--bg-card);
+    border: var(--border-subtle);
+    color: var(--text-main);
+    padding: 12px 20px;
+    border-radius: 50px;
+    font-size: 0.95rem;
+    outline: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    appearance: none;
+    -webkit-appearance: none;
+    /* Custom Arrow Icon */
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 15px center;
+    background-size: 16px;
+    padding-right: 40px;
+    min-width: 160px;
+}
+
+.filter-select:hover, .filter-select:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 15px rgba(0, 255, 157, 0.1);
+}
+
+.filter-select option {
+    background: #1a1a1a; /* Hardcoded dark bg for dropdown options to ensure visibility */
+    color: white;
+    padding: 10px;
 }
 
 /* --- Components: Navbar --- */
