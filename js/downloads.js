@@ -182,10 +182,10 @@ function createDeviceElements(devices) {
 
         let variantsHtml = '';
         if (buildData && buildData.variants) {
-            if (buildData.variants.gapps) variantsHtml += '<span style="font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; background: rgba(0,194,255,0.2); color: var(--color-secondary); margin-right: 4px;">Full</span>';
-            if (buildData.variants.basicgapps) variantsHtml += '<span style="font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; background: rgba(0,194,255,0.2); color: var(--color-secondary); margin-right: 4px;">Basic</span>';
-            if (buildData.variants.coregapps) variantsHtml += '<span style="font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; background: rgba(0,194,255,0.2); color: var(--color-secondary); margin-right: 4px;">Core</span>';
-            if (buildData.variants.vanilla) variantsHtml += '<span style="font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; background: rgba(255,165,0,0.2); color: orange; margin-right: 4px;">Vanilla</span>';
+            if (buildData.variants.gapps) variantsHtml += '<span style="font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; background: rgba(0,194,255,0.1); border: 1px solid rgba(0,194,255,0.2); color: var(--color-secondary); margin-right: 4px;">Full</span>';
+            if (buildData.variants.basicgapps) variantsHtml += '<span style="font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; background: rgba(0,194,255,0.1); border: 1px solid rgba(0,194,255,0.2); color: var(--color-secondary); margin-right: 4px;">Basic</span>';
+            if (buildData.variants.coregapps) variantsHtml += '<span style="font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; background: rgba(0,194,255,0.1); border: 1px solid rgba(0,194,255,0.2); color: var(--color-secondary); margin-right: 4px;">Core</span>';
+            if (buildData.variants.vanilla) variantsHtml += '<span style="font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; background: rgba(255,165,0,0.1); border: 1px solid rgba(255,165,0,0.3); color: orange; margin-right: 4px;">Vanilla</span>';
         }
 
         const imageUrl = device.image_url;
@@ -308,10 +308,10 @@ function renderVariantInfo(variants) {
       if (!build) continue;
       const label = typeMap[key] || key.charAt(0).toUpperCase() + key.slice(1);
       html += `
-        <div class="variant-item" style="background: var(--bg-card); padding: 15px; border-radius: 8px; border: 1px solid var(--border-subtle);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px;">
+        <div class="variant-item modal-box-inset" style="margin-bottom: 15px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; border-bottom: 1px solid var(--border-subtle); padding-bottom: 8px;">
                 <strong style="color: var(--color-primary); font-size: 1.1rem;">${label}</strong>
-                <span style="font-size: 0.8rem; background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 4px;">v${build.version}</span>
+                <span style="font-size: 0.8rem; background: rgba(125,125,125,0.1); padding: 2px 8px; border-radius: 4px; color: var(--text-muted);">v${build.version}</span>
             </div>
             <div style="font-size: 0.9rem; display: grid; grid-template-columns: 85px minmax(0, 1fr); gap: 5px; align-items: baseline;">
                 <span style="color: var(--text-muted);">Filename:</span><span style="word-break: break-all;">${build.filename}</span>
@@ -384,7 +384,7 @@ function initModalLogic() {
             ${changelog ? '<button class="tab-btn" data-target="changelog">Changelog</button>' : ''}
         </div>
         <div id="view-builds">${renderVariantInfo(variants)}</div>
-        ${changelog ? `<div id="view-changelog" style="display: none; max-height: 300px; overflow-y: auto; background: var(--bg-surface); padding: 15px; border-radius: 8px; font-family: monospace; font-size: 0.9rem; line-height: 1.5;"><div style="white-space: normal;">${formatChangelog(changelog)}</div></div>` : ''}
+        ${changelog ? `<div id="view-changelog" class="modal-box-inset" style="display: none; max-height: 300px; overflow-y: auto; font-family: monospace; font-size: 0.9rem; line-height: 1.5;"><div style="white-space: normal;">${formatChangelog(changelog)}</div></div>` : ''}
     `;
     
     modalBody.innerHTML = content;
@@ -515,9 +515,9 @@ function formatChangelog(text) {
     return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }[m];
   });
   formatted = formatted.replace(/^#\s+.*\n?/gm, '');
-  formatted = formatted.replace(/^##\s+(.*)$/gm, '<div style="font-size: 1.3rem; font-weight: bold; margin-top: 10px; margin-bottom: 10px; color: var(--color-primary); border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;">$1</div>');
-  formatted = formatted.replace(/^###\s+(.*)$/gm, '<div style="font-size: 1.1rem; font-weight: bold; margin-top: 15px; margin-bottom: 5px; color: var(--text-main);">$1</div>');
-  formatted = formatted.replace(/^---+\s*$/gm, '<hr style="border: 0; border-top: 1px dashed var(--text-muted); margin: 20px 0; opacity: 0.3;">');
+  formatted = formatted.replace(/^##\s+(.*)$/gm, '<div style="font-size: 1.3rem; font-weight: bold; margin-top: 10px; margin-bottom: 10px; color: var(--color-primary); border-bottom: 2px solid var(--text-muted); padding-bottom: 5px; opacity: 0.8;">$1</div>');
+  formatted = formatted.replace(/^###\s+(.*)$/gm, '<div style="font-size: 1.1rem; font-weight: bold; margin-top: 15px; margin-bottom: 5px; color: var(--text-main); border-bottom: 1px solid var(--border-subtle); padding-bottom: 3px;">$1</div>');
+  formatted = formatted.replace(/^---+\s*$/gm, '<hr style="border: 0; border-top: 1px dashed var(--text-muted); margin: 20px 0; opacity: 0.5;">');
   formatted = formatted.replace(/^-\s+(.*)$/gm, `
     <div style="display: flex; align-items: flex-start; margin-bottom: 1px;">
         <span style="flex-shrink: 0; margin-right: 10px; color: var(--text-muted); user-select: none;">-</span>

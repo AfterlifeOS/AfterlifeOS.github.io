@@ -52,8 +52,7 @@
                     </p>
                 </div>
                 <div style="position: relative;">
-                    <div style="position: absolute; inset: 0; background: var(--color-primary); filter: blur(80px); opacity: 0.15; border-radius: 50%;"></div>
-                    <img src="/img/home.webp" alt="Community" style="position: relative; width: 100%; border-radius: 20px; border: 1px solid var(--border-subtle); transform: rotate(2deg); box-shadow: 0 20px 50px rgba(0,0,0,0.5);">
+                    <img src="/img/home.webp" alt="Community" class="about-image">
                 </div>
             </div>
 
@@ -82,7 +81,7 @@
             </div>
 
             <!-- Philosophy / CTA -->
-            <div style="text-align: center; padding: 60px; background: linear-gradient(180deg, var(--bg-card) 0%, transparent 100%); border-radius: 20px; border: 1px solid var(--border-subtle);">
+            <div style="text-align: center; padding: 60px;">
                 <h2 style="font-size: 3rem; margin-bottom: 20px;">The <span class="text-gradient">#NeverDie</span> Spirit</h2>
                 <p style="max-width: 700px; margin: 0 auto 40px; font-size: 1.2rem; color: var(--text-muted);">
                     It's not just a slogan. It's a promise. A promise that as long as there is code to be written and a community to support it, the Afterlife will continue.
@@ -131,6 +130,19 @@
             grid-template-columns: 1fr 1fr;
             gap: 60px;
             align-items: center;
+        }
+        .about-image {
+            position: relative; 
+            width: 100%; 
+            border-radius: 20px; 
+            border: 1px solid var(--border-subtle); 
+            transform: rotate(2deg); 
+            /* box-shadow removed */
+            transition: all 0.3s ease;
+        }
+        body.light-mode .about-image {
+            border: none;
+            /* box-shadow removed */
         }
         @media(max-width: 768px) {
             .grid-2 { grid-template-columns: 1fr; }

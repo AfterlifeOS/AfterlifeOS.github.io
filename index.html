@@ -32,9 +32,17 @@
     <section class="hero">
         <!-- Background Collage Elements -->
         <div class="hero-bg-collage">
-            <img src="/img/screenshot_1.webp" alt="" class="collage-img img-left" style="opacity: 0;">
-            <img src="/img/screenshot_2.webp" alt="" class="collage-img img-right" style="opacity: 0;">
+            <!-- Wrapped in a solid background div to block the grid behind it -->
+            <div class="collage-wrapper img-left">
+                <img src="/img/screenshot_1.webp" alt="">
+            </div>
+            <div class="collage-wrapper img-right">
+                <img src="/img/screenshot_2.webp" alt="">
+            </div>
+            
             <div class="hero-overlay-gradient"></div>
+            <!-- Dedicated Light Mode Overlay for Smooth Opacity Transition -->
+            <div class="hero-overlay-light"></div>
         </div>
 
         <div class="container hero-container animate-on-scroll">
@@ -313,37 +321,23 @@
 
     <!-- Local Styles for Hero (specific to home) -->
     <style>
-        /* Ambient Background Glow */
-        .hero::before {
-            content: '';
-            position: absolute;
-            top: -20%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            height: 80%;
-            background: radial-gradient(circle, rgba(0, 255, 157, 0.12) 0%, transparent 60%);
-            z-index: 0;
-            pointer-events: none;
-            filter: blur(80px);
-        }
-
         .hero {
             position: relative;
-            min-height: 80vh; /* Reduced from 90vh */
+            min-height: 80vh; 
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
             padding-top: var(--nav-height);
             padding-bottom: 60px;
-            /* Background grid removed here as it is now global on body */
+            background-color: transparent; /* Transparent to show body grid */
+            transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         /* Tablet/Pad Specific Adjustments */
         @media (min-width: 601px) and (max-width: 1248px) {
             .hero {
-                min-height: 70vh; /* Much shorter for tablets */
+                min-height: 70vh;
                 padding-top: 100px;
             }
         }
@@ -354,180 +348,144 @@
             top: 0; left: 0; width: 100%; height: 100%;
             z-index: 0;
             pointer-events: none;
-            overflow: hidden; /* Prevent scrollbars from tilted images */
+            overflow: hidden;
         }
 
-        .collage-img {
+        .collage-wrapper {
             position: absolute;
             width: 320px;
-            opacity: 0; /* Start hidden for animation */
             border-radius: 12px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            /* Removed grayscale, increased visibility */
-            transition: all 1s ease-out;
+            background-color: var(--bg-body); /* Blocks the grid */
+            overflow: hidden;
+            opacity: 0; /* Starts hidden */
+            animation: floatInSimple 1.5s ease-out forwards;
+            transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        /* Animation entry for images - End state opacity increased to 0.7 */
-        .collage-img { animation: floatInSimple 1.5s ease-out forwards; }
+        .collage-wrapper img {
+            width: 100%;
+            height: auto;
+            display: block;
+            opacity: 0.2; /* Low opacity image sitting on solid bg */
+            filter: grayscale(20%);
+            transition: opacity 0.5s;
+        }
         
-        @keyframes floatInSimple {
-            to { opacity: 0.7; }
+        body.light-mode .collage-wrapper img {
+             opacity: 0.15;
         }
 
-        /* Enhanced Overlay - Minimal blocking */
-        .hero-overlay-gradient {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            /* Combined Gradients: Vignette + Bottom Fade */
-            background: 
-                radial-gradient(circle at center, var(--bg-body) 10%, rgba(5,5,5,0.4) 50%, transparent 100%),
-                linear-gradient(to bottom, transparent 85%, var(--bg-body) 100%);
-            z-index: 1;
+        /* Animation fades in the WRAPPER (solid block) */
+        @keyframes floatInSimple {
+            to { opacity: 1; }
+        }
+
+        /* Overlays removed as requested */
+        .hero-overlay-gradient, .hero-overlay-light {
+            display: none;
         }
 
         /* Content Styling */
         .hero-container {
             position: relative;
-            z-index: 2; /* Text clearly above everything */
+            z-index: 2;
             width: 100%;
             display: flex;
             justify-content: center;
         }
 
-        /* Add text shadow to ensure readability - Reduced intensity */
+        /* Text shadows removed as requested */
         .hero-title, .hero-subtitle, .hero-cta {
-             text-shadow: 0 5px 15px rgba(0,0,0,0.5);
+             text-shadow: none;
         }
         
         .hero-content {
-             /* Much softer gradient that fades completely before edges */
-             background: radial-gradient(closest-side, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.5) 40%, transparent 100%);
+             background: none; /* Gradient background removed */
              padding: 40px 20px;
-             /* Removed border-radius: 50% to prevent visible clipping shape */
              text-align: center;
              max-width: 850px;
              margin: 0 auto;
              position: relative;
-             z-index: 10; /* Ensure text is above images */
+             z-index: 10;
         }
 
         .hero-cta {
             display: flex;
             justify-content: center;
-            gap: 20px;
+            gap: 32px; /* Increased for better spacing */
             flex-wrap: wrap;
             width: 100%;
-            margin-top: 30px;
+            margin-top: 40px; /* Increased for better spacing */
         }
 
-        /* Mobile specific spacing for buttons when stacked */
+        /* Mobile specific spacing */
         @media (max-width: 600px) {
             .hero-cta {
                 flex-direction: column;
-                align-items: center; /* Ensures items are centered horizontally */
-                gap: 15px;
+                align-items: center;
+                gap: 20px;
             }
             .hero-cta .btn {
-                width: auto; /* Let content dictate width, or use a fixed small width */
-                min-width: 200px; /* Minimum width for consistency */
-                max-width: 80%; /* Prevent touching edges */
-                margin: 0 auto; /* Explicit centering */
-                padding: 12px 24px; /* Slightly smaller padding */
-                font-size: 0.95rem; /* Slightly smaller text */
+                min-width: 200px;
+                max-width: 80%;
+                margin: 0 auto;
             }
         }
 
         /* Responsive Background Image Handling */
-        .collage-img {
-            width: 180px; /* Significantly reduced for narrow screens */
-            filter: drop-shadow(0 15px 30px rgba(0,0,0,0.6));
-            opacity: 0; /* Start invisible */
+        .collage-wrapper {
+             /* Base styles handled above */
+        }
+        
+        /* Mobile Override */
+        @media (max-width: 600px) {
+            .collage-wrapper {
+                 width: 180px;
+                 animation-name: floatInMobile;
+            }
         }
 
-        /* Custom animation for mobile to keep opacity low (0.3) */
-        .collage-img { animation: floatInMobile 1.5s ease-out forwards; }
-
         @keyframes floatInMobile {
-            to { opacity: 0.75; } /* Lower opacity on mobile */
+            to { opacity: 1; }
         }
 
         .img-left {
             top: 5%;
-            left: -40px; /* Pushed very far out */
-            transform: rotate(25deg); /* Minimal rotation */
+            left: -40px;
+            transform: rotate(25deg);
             z-index: 0;
         }
 
         .img-right {
             bottom: -10%;
-            right: -40px; /* Pushed very far out */
-            transform: rotate(-25deg); /* Minimal rotation */
+            right: -40px;
+            transform: rotate(-25deg);
             z-index: 0;
         }
 
         /* Desktop Adjustments */
         @media (min-width: 1392px) {
-            .collage-img { width: 380px; }
-            
-            /* Precision positioning for Desktop framing */
-            .img-left { 
-                left: -25px; 
-                top: -5%; 
-                transform: rotate(30deg); 
-            }
-            .img-right { 
-                right: -25px; 
-                bottom: -10%; 
-                transform: rotate(-30deg); 
-            }
-            
-            .hero-overlay-gradient {
-                 /* Aggressive bottom fade to ensure images are fully covered at the bottom */
-                 background: radial-gradient(circle at center, var(--bg-body) 20%, rgba(5,5,5,0.5) 60%, transparent 100%)
-            }
-            
-            .hero-content {
-                 background: none; 
-                 padding: 0 20px;
-            }
+            .collage-wrapper { width: 380px; }
+            .img-left { left: -25px; top: -5%; transform: rotate(30deg); }
+            .img-right { right: -25px; bottom: -10%; transform: rotate(-30deg); }
         }
 
         @media (min-height: 1248px) {
-            .collage-img { width: 380px; }
-            
-            /* Precision positioning for Desktop framing */
-            .img-left { 
-                left: -25px; 
-                top: -5%; 
-                transform: rotate(30deg); 
-            }
-            .img-right { 
-                right: -25px; 
-                bottom: 50%; 
-                transform: rotate(-30deg); 
-            }
-            
-            .hero-overlay-gradient {
-                 /* Aggressive bottom fade to ensure images are fully covered at the bottom */
-                 background: radial-gradient(circle at center, var(--bg-body) 20%, rgba(5,5,5,0.5) 60%, transparent 100%)
-            }
-            
-            .hero-content {
-                 background: none; 
-                 padding: 0 20px;
-            }
+            .collage-wrapper { width: 380px; }
+            .img-left { left: -25px; top: -5%; transform: rotate(30deg); }
+            .img-right { right: -25px; bottom: 50%; transform: rotate(-30deg); }
         }
 
         /* Section Feature Preview */
         .grid-2 {
             display: grid;
-            grid-template-columns: 0.8fr 1.2fr; /* Gallery slightly wider */
+            grid-template-columns: 0.8fr 1.2fr;
             gap: 60px;
             align-items: center;
         }
 
         .content-text {
-            order: 2; /* Text on the right visually (modern taste) or left, default left */
+            order: 2;
         }
 
         .feature-list-check li {
@@ -535,7 +493,7 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            font-size: 1.25rem; /* Larger list */
+            font-size: 1.25rem;
         }
 
         .section-title {
@@ -549,7 +507,7 @@
             width: 100%;
             max-width: 260px; 
             margin: 0 auto;
-            aspect-ratio: 9/19; /* Maintains phone shape */
+            aspect-ratio: 9/19;
             perspective: 1000px;
         }
         
@@ -557,11 +515,11 @@
             position: relative;
             width: 100%;
             height: 100%;
-            overflow: hidden; /* Ensure nothing sticks out */
+            overflow: hidden;
         }
         
         .screenshot-scroller img {
-            position: absolute; /* Key fix: Force overlapping */
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
@@ -590,17 +548,31 @@
 
         .dot {
             width: 10px; height: 10px;
-            background: rgba(255,255,255,0.1);
+            background: rgba(125,125,125,0.2);
             border-radius: 50%;
             transition: all 0.3s;
-            cursor: pointer; /* Clickable */
+            cursor: pointer;
+        }
+        body.light-mode .dot {
+            background: rgba(0,0,0,0.1);
         }
         .dot.active {
-            background: var(--color-primary);
-            box-shadow: 0 0 15px var(--color-primary);
+            background: #00FF9D !important; /* Force Neon Green in both modes */
+            box-shadow: 0 0 15px rgba(0, 255, 157, 0.8);
             transform: scale(1.2);
         }
         
+        /* Light Mode Specific Hero Fixes */
+        body.light-mode .hero-content {
+            background: none;
+            text-shadow: none;
+        }
+
+        body.light-mode .collage-img {
+            box-shadow: none;
+            opacity: 0.15;
+        }
+
         /* --- New Sections Styling --- */
         
         /* About Cards Grid */
@@ -612,9 +584,9 @@
         }
 
         .info-card {
-            background: #111111; /* Solid dark background (More visible) */
-            border: 1px solid rgba(255, 255, 255, 0.15); /* Stronger border */
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            background: var(--bg-card); /* Use variable */
+            border: var(--border-subtle);
+            box-shadow: var(--shadow-card);
             padding: 30px;
             border-radius: 24px;
             transition: all 0.3s ease;
@@ -625,9 +597,9 @@
 
         .info-card:hover {
             transform: translateY(-10px);
-            background: #1a1a1a; /* Solid lighter color (Fixes transparency issue) */
+            background: var(--bg-card-hover); /* Use variable */
             border-color: var(--color-primary);
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
+            box-shadow: var(--glow-primary);
         }
 
         .info-icon {
@@ -640,10 +612,10 @@
 
         /* Terminal Section (Changelog) */
         .terminal-wrapper {
-            background: #0d0d0d;
+            background: var(--bg-card); /* Use variable */
             border-radius: 12px;
             border: 1px solid #333;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
             overflow: hidden;
             font-family: 'Courier New', monospace;
             max-width: 800px;
@@ -651,11 +623,11 @@
         }
 
         .terminal-header {
-            background: #1a1a1a;
+            background: var(--bg-surface); /* Use variable */
             padding: 10px 15px;
             display: flex;
             gap: 8px;
-            border-bottom: 1px solid #333;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
 
         .term-dot { width: 12px; height: 12px; border-radius: 50%; }
@@ -665,14 +637,14 @@
 
         .terminal-body {
             padding: 20px;
-            color: #d4d4d4;
+            color: var(--text-muted); /* Variable */
             font-size: 0.95rem;
             line-height: 1.6;
         }
 
         .cmd-line { display: block; margin-bottom: 8px; }
         .cmd-prompt { color: var(--color-primary); margin-right: 10px; }
-        .cmd-output { color: #888; margin-bottom: 15px; display: block; }
+        .cmd-output { color: var(--text-muted); margin-bottom: 15px; display: block; }
         .cursor { display: inline-block; width: 8px; height: 15px; background: var(--color-primary); animation: blink 1s infinite; vertical-align: middle; }
 
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }

@@ -1,4 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Inject Theme Toggle Button
+    injectThemeToggle();
+
     // Mobile Menu Toggle
     const mobileToggle = document.getElementById('mobileToggle');
     const navLinks = document.getElementById('navLinks');
@@ -24,10 +27,10 @@ document.addEventListener('DOMContentLoaded', () => {
     window.addEventListener('scroll', () => {
         if (window.innerWidth > 900) {
             if (window.scrollY > 50) {
-                navbar.style.background = 'rgba(5, 5, 5, 0.95)';
+                navbar.style.background = 'var(--nav-bg-scrolled)';
                 navbar.style.boxShadow = '0 4px 20px rgba(0,0,0,0.5)';
             } else {
-                navbar.style.background = 'rgba(10, 10, 10, 0.7)'; // Match new CSS default
+                navbar.style.background = 'var(--nav-bg)'; // Match CSS variable
                 navbar.style.boxShadow = 'none';
             }
         } else {
@@ -59,6 +62,84 @@ document.addEventListener('DOMContentLoaded', () => {
     // Initialize Lightbox
     initLightbox();
 });
+
+function injectThemeToggle() {
+    const navLinks = document.getElementById('navLinks');
+    const mobileToggle = document.getElementById('mobileToggle');
+    const navContainer = document.querySelector('.nav-container');
+    
+    if (!navLinks || !navContainer) return;
+
+    // 1. Desktop Toggle (Inside Nav Links)
+    if (!document.getElementById('themeToggleBtnDesktop')) {
+        const li = document.createElement('li');
+        li.className = 'desktop-only-toggle'; // CSS class to hide on mobile
+        li.innerHTML = `
+            <button id="themeToggleBtnDesktop" class="theme-toggle-btn" aria-label="Toggle Dark Mode">
+                <i class="fas fa-moon"></i>
+            </button>
+        `;
+        navLinks.appendChild(li);
+    }
+
+    // 2. Mobile Toggle (Next to Hamburger)
+    if (!document.getElementById('themeToggleBtnMobile') && mobileToggle) {
+        const btn = document.createElement('div');
+        btn.innerHTML = `
+            <button id="themeToggleBtnMobile" class="theme-toggle-btn mobile-only-toggle" aria-label="Toggle Dark Mode" style="margin-right: 10px;">
+                <i class="fas fa-moon"></i>
+            </button>
+        `;
+        // Insert before the hamburger icon
+        navContainer.insertBefore(btn.firstElementChild, mobileToggle);
+    }
+
+    // Initialize Logic for BOTH buttons
+    const toggles = [
+        document.getElementById('themeToggleBtnDesktop'),
+        document.getElementById('themeToggleBtnMobile')
+    ];
+
+    // Check saved preference
+    const savedTheme = localStorage.getItem('theme');
+    
+    // Apply initial theme
+    const applyTheme = (isLight) => {
+        if (isLight) {
+            document.body.classList.add('light-mode');
+            toggles.forEach(t => { if(t) t.querySelector('i').className = 'fas fa-sun'; });
+        } else {
+            document.body.classList.remove('light-mode');
+            toggles.forEach(t => { if(t) t.querySelector('i').className = 'fas fa-moon'; });
+        }
+    };
+
+    if (savedTheme === 'light') {
+        applyTheme(true);
+    } else {
+        applyTheme(false);
+    }
+
+    // Toggle Event
+    toggles.forEach(btn => {
+        if (!btn) return;
+        btn.addEventListener('click', (e) => {
+            // Prevent event bubbling if necessary
+            e.stopPropagation();
+            
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            
+            // Sync both buttons
+            toggles.forEach(t => { 
+                if(t) t.querySelector('i').className = isLight ? 'fas fa-sun' : 'fas fa-moon'; 
+            });
+            
+            // Save Preference
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        });
+    });
+}
 
 function generateSocialLinks(socials) {
     if (!socials) return '';

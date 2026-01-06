@@ -9,6 +9,8 @@
     --bg-surface: #0A0A0A;
     --bg-card: #111111;
     --bg-card-hover: #161616;
+    --nav-bg: rgba(10, 10, 10, 0.7);
+    --nav-bg-scrolled: rgba(5, 5, 5, 0.95);
     
     /* Text */
     --text-main: #FFFFFF;
@@ -17,7 +19,7 @@
     
     /* Spacing & Layout */
     --nav-height: 80px;
-    --container-width: 1400px; /* Widened from 1200px */
+    --container-width: 1400px;
     --radius-sm: 8px;
     --radius-md: 16px;
     --radius-lg: 24px;
@@ -26,6 +28,65 @@
     --glow-primary: 0 0 20px rgba(0, 255, 157, 0.3);
     --glow-secondary: 0 0 20px rgba(0, 194, 255, 0.3);
     --border-subtle: 1px solid rgba(255, 255, 255, 0.1);
+    --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.6);
+}
+
+body.light-mode {
+    /* Material Expressive Light Palette */
+    /* Using a very subtle blue-ish grey tint for body to reduce eye strain vs pure white */
+    --bg-body: #F0F2F5; 
+    
+    /* Surfaces stay white to pop against the tinted body */
+    --bg-surface: #FFFFFF;
+    
+    /* Cards get a clean white look */
+    --bg-card: #FFFFFF;
+    --bg-card-hover: #F8FAFC;
+    
+    --nav-bg: rgba(255, 255, 255, 0.85);
+    --nav-bg-scrolled: rgba(255, 255, 255, 0.98);
+
+    /* Text - High contrast but not harsh black (#000000) */
+    --text-main: #1A1C1E; 
+    --text-muted: #545B67;
+    --text-dark: #FFFFFF; /* Inverted logic for buttons */
+
+    /* Effects - Softer, diffused shadows for light mode */
+    --border-subtle: 1px solid rgba(0, 0, 0, 0.06);
+    --glow-primary: 0 4px 15px rgba(0, 255, 157, 0.25);
+    --shadow-card: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+/* Global Transition for Smooth Theme Switching */
+/* Optimized: Only target main containers and color properties to prevent layout thrashing */
+body {
+    transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1), 
+                color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Specific components that need smooth transition */
+.navbar, 
+.card, 
+.info-card, 
+.device-card, 
+.variant-item, 
+.btn, 
+.search-input, 
+.filter-select, 
+.nav-links, 
+.modal-content, 
+.terminal-wrapper, 
+.terminal-header,
+.footer {
+    transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                border-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Smooth text color changes */
+h1, h2, h3, h4, h5, h6, p, span, a, i {
+    transition: color 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 * {

@@ -147,6 +147,11 @@
             word-wrap: break-word;
             word-break: break-word;
             hyphens: auto;
+            
+            /* Add smooth transitions for theme changes */
+            transition: background-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                        border-color 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+                        box-shadow 0.5s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* 1. Core Team, Designers & Contributors 
