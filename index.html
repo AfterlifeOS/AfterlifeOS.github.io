@@ -33,10 +33,11 @@
         <!-- Background Collage Elements -->
         <div class="hero-bg-collage">
             <!-- Wrapped in a solid background div to block the grid behind it -->
-            <div class="collage-wrapper img-left">
+            <!-- Inline style added to prevent FOUC (Flash of Unstyled Content) -->
+            <div class="collage-wrapper img-left" style="opacity: 0; visibility: hidden;">
                 <img src="/img/screenshot_1.webp" alt="">
             </div>
-            <div class="collage-wrapper img-right">
+            <div class="collage-wrapper img-right" style="opacity: 0; visibility: hidden;">
                 <img src="/img/screenshot_2.webp" alt="">
             </div>
             
@@ -377,7 +378,8 @@
 
         /* Animation fades in the WRAPPER (solid block) */
         @keyframes floatInSimple {
-            to { opacity: 1; }
+            0% { opacity: 0; visibility: visible; }
+            100% { opacity: 1; visibility: visible; }
         }
 
         /* Overlays removed as requested */
@@ -446,7 +448,8 @@
         }
 
         @keyframes floatInMobile {
-            to { opacity: 1; }
+            0% { opacity: 0; visibility: visible; }
+            100% { opacity: 1; visibility: visible; }
         }
 
         .img-left {
