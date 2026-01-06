@@ -38,7 +38,7 @@ Improve stability and performance
         `
     },
     {
-        version: "AfterlifeOS v8.0 Happiness",
+        version: "AfterlifeOS v8.1 Happiness",
         date: "November 09, 2025",
         changes: `
 Bump security string to November 1, 2025

@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - AfterlifeOS</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet" />
+    <style>
+        * { box-sizing: border-box; }
+        html, body { height: 100%; margin: 0; padding: 0; overflow-x: hidden; }
+        body { min-height: 100vh; display: flex; flex-direction: column; background-color: var(--bg-body); font-family: 'Google Sans', sans-serif; }
+        
+        .main-wrapper {
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .login-wrapper {
+            display: none; /* Hidden by default to prevent flash */
+            align-items: center;
+            justify-content: center;
+            flex: 1; /* Takes full available height */
+            width: 100%;
+            padding: 40px 0;
+        }
+
+        .dashboard-wrapper {
+            display: none;
+            width: 100%;
+            padding: 40px 0;
+        }
+
+        .card-admin {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 30px;
+            width: 100%;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+        }
+
+        .form-group { margin-bottom: 20px; text-align: left; }
+        .form-label { display: block; margin-bottom: 8px; color: var(--text-muted); font-weight: 500; font-size: 0.9rem; }
+        .form-input, .form-textarea {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-family: inherit;
+            resize: vertical;
+            box-sizing: border-box;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        .form-input:focus, .form-textarea:focus {
+            border-color: var(--color-primary);
+            outline: none;
+        }
+        .form-textarea { min-height: 150px; font-family: monospace; line-height: 1.5; }
+        
+        .log-item {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-subtle);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            position: relative;
+            transition: all 0.3s;
+        }
+        .log-item:hover { border-color: var(--color-primary); }
+        
+        .log-header {
+            display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;
+        }
+        .log-content {
+            background: rgba(0,0,0,0.2); 
+            padding: 15px; 
+            border-radius: 8px; 
+            font-family: monospace; 
+            font-size: 0.85rem; 
+            color: var(--text-muted); 
+            max-height: 120px; 
+            overflow-y: auto; 
+            white-space: pre-wrap;
+            margin-bottom: 15px;
+        }
+        body.light-mode .log-content { background: rgba(0,0,0,0.05); }
+
+        .log-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        .status-badge {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 12px 24px;
+            border-radius: 50px;
+            background: var(--bg-card);
+            border: 1px solid var(--color-primary);
+            color: var(--text-main);
+            display: none;
+            z-index: 9999;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            animation: fadeInUp 0.3s ease-out;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Main Container -->
+    <div class="main-wrapper">
+
+        <!-- Login Screen -->
+        <div id="loginScreen" class="login-wrapper">
+            <div class="card-admin" style="max-width: 400px; text-align: center;">
+                <h2 class="text-gradient" style="margin-bottom: 10px;">Admin Access</h2>
+                <p style="color: var(--text-muted); margin-bottom: 30px; font-size: 0.9rem;">Manage AfterlifeOS changelogs securely via GitHub API.</p>
+                
+                <div class="form-group">
+                    <label class="form-label">GitHub Personal Access Token</label>
+                    <input type="password" id="githubToken" class="form-input" placeholder="ghp_..." autocomplete="off">
+                </div>
+                
+                <button onclick="AdminCMS.login()" class="btn btn-primary" style="width: 100%;">
+                    Login to Dashboard
+                </button>
+                <p id="loginError" style="color: #ff4d4d; margin-top: 15px; font-size: 0.9rem; display: none;"></p>
+            </div>
+        </div>
+
+        <!-- Dashboard Screen -->
+        <div id="dashboardScreen" class="dashboard-wrapper">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <div>
+                    <h1 class="text-gradient" style="margin-bottom: 5px;">Changelog Manager</h1>
+                    <p style="color: var(--text-muted); font-size: 0.9rem;">Logged in as <span id="adminUsername" style="color: var(--color-primary);">User</span></p>
+                </div>
+                <button onclick="AdminCMS.logout()" class="btn btn-outline" style="padding: 8px 20px; font-size: 0.9rem;">Logout</button>
+            </div>
+
+            <!-- Editor Form -->
+            <div class="card-admin" style="margin-bottom: 40px; border-left: 4px solid var(--color-primary);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 id="formTitle" style="margin: 0;"><i class="fas fa-pen-fancy"></i> Create New Release</h3>
+                    <button id="cancelEditBtn" onclick="AdminCMS.cancelEdit()" class="btn btn-outline" style="display: none; padding: 5px 15px; font-size: 0.8rem;">Cancel Edit</button>
+                </div>
+                
+                <div class="grid-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div class="form-group" style="margin: 0;">
+                        <label class="form-label">Version Name</label>
+                        <input type="text" id="newVersion" class="form-input" placeholder="e.g. AfterlifeOS v9.0">
+                    </div>
+                    <div class="form-group" style="margin: 0;">
+                        <label class="form-label">Release Date</label>
+                        <input type="text" id="newDate" class="form-input" placeholder="e.g. January 15, 2026">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Changes (Markdown Supported)</label>
+                    <textarea id="newChanges" class="form-textarea" placeholder="- Added new feature&#10;- Fixed bugs"></textarea>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer;">
+                        <input type="checkbox" id="newIsLatest" checked>
+                        <span style="color: var(--text-main); font-size: 0.95rem;">Mark as <strong>Latest Release</strong></span>
+                    </label>
+                    <button id="saveBtn" onclick="AdminCMS.saveEntry()" class="btn btn-primary" style="padding: 10px 30px;">Publish Update</button>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px; display: flex; align-items: center; gap: 15px;">
+                <h3>History</h3>
+                <div style="flex: 1; height: 1px; background: var(--border-subtle);"></div>
+            </div>
+
+            <div id="logList">
+                <!-- Populated by JS -->
+                <div style="text-align: center; color: var(--text-muted); padding: 40px;">
+                    <i class="fas fa-spinner fa-spin"></i> Connecting to GitHub...
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="statusToast" class="status-badge">
+        <i class="fas fa-info-circle"></i> <span id="statusText">Operation...</span>
+    </div>
+
+    <script src="cms.js"></script>
+</body>
+</html>
