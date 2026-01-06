@@ -102,7 +102,8 @@ const AdminCMS = {
     loadData: async function() {
         const list = document.getElementById('logList');
         try {
-            const url = `https://api.github.com/repos/${this.config.owner}/${this.config.repo}/contents/${this.config.path}?ref=${this.config.branch}`;
+            // Add timestamp to prevent caching
+            const url = `https://api.github.com/repos/${this.config.owner}/${this.config.repo}/contents/${this.config.path}?ref=${this.config.branch}&t=${Date.now()}`;
             const res = await fetch(url, {
                 headers: { 
                     'Authorization': `token ${this.token}`,

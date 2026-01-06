@@ -1,44 +1,52 @@
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
     const timelineContainer = document.querySelector('.timeline');
-    
     if (!timelineContainer) return;
 
-    // Debugging: Check if data is loaded
-    console.log("Checking for changelogsData...");
+    // Fetch data with anti-cache timestamp
+    const dataUrl = `/js/data_changelogs.js?v=${Date.now()}`;
 
-    // Try to access the variable directly
-    let data = null;
     try {
-        if (typeof changelogsData !== 'undefined') {
-            data = changelogsData;
-        } else if (window.changelogsData) {
-            data = window.changelogsData;
+        const response = await fetch(dataUrl);
+        if (!response.ok) throw new Error("Failed to load changelogs");
+
+        const scriptContent = await response.text();
+        
+        // Extract JSON from the JS file content
+        // Pattern: removes "window.changelogsData =" from start and ";" from end
+        const jsonString = scriptContent
+            .replace(/^\s*window\.changelogsData\s*=\s*/, '')
+            .replace(/;\s*$/, '');
+
+        // Safe eval to convert string array to object
+        // We use Function instead of JSON.parse because the file might strictly be JS object notation (not strict JSON)
+        // e.g. keys might not be quoted, or it uses backticks
+        const data = new Function('return ' + jsonString)();
+
+        if (Array.isArray(data)) {
+            renderChangelogs(data, timelineContainer);
+        } else {
+            throw new Error("Data format invalid");
         }
+
     } catch (e) {
-        console.error("Error accessing data variable:", e);
+        console.error("Changelog loading error:", e);
+        timelineContainer.innerHTML = `
+            <div style="text-align: center; color: var(--text-muted); padding: 40px;">
+                <i class="fas fa-exclamation-circle" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                <p>Failed to load updates. Check connection.</p>
+            </div>
+        `;
     }
-
-    if (!data) {
-        console.error('Error: changelogsData is not found. Ensure js/data_changelogs.js is loaded properly.');
-        timelineContainer.innerHTML = '<p style="text-align: center; color: var(--text-muted);">Failed to load data. Please refresh.</p>';
-        return;
-    }
-
-    console.log("Data found, rendering...", data);
-    renderChangelogs(data, timelineContainer);
 });
 
 function renderChangelogs(logs, container) {
-    container.innerHTML = ''; // Clear loading
+    container.innerHTML = '';
 
     logs.forEach(log => {
         const item = document.createElement('div');
         item.className = 'timeline-item';
         
-        // Parse the multi-line string into HTML list items
         const changesListHtml = parseChanges(log.changes);
-        
-        // Badge HTML if latest
         const badgeHtml = log.isLatest ? '<span class="badge" style="margin-left: 10px;">Latest</span>' : '';
 
         item.innerHTML = `
@@ -56,20 +64,13 @@ function renderChangelogs(logs, container) {
     });
 }
 
-// Helper to convert raw text block into <li> elements
 function parseChanges(textBlock) {
     if (!textBlock) return '';
-
     return textBlock
-        .split('\n')                  // Split by new line
-        .map(line => line.trim())     // Remove extra whitespace
-        .filter(line => line.length > 0) // Remove empty lines
+        .split('\n')
+        .map(line => line.trim())
+        .filter(line => line.length > 0)
         .map(line => {
-            // Aggressively remove common list markers from the start:
-            // 1. Numbers (1., 1), 01.)
-            // 2. Bullets (-, *, +, >)
-            // 3. Dots (.)
-            // 4. Leading whitespace is already trimmed above
             const cleanLine = line.replace(/^(\d+[\.\)]|[-*+>•.])\s*/, ''); 
             return `<li>${cleanLine}</li>`;
         })
