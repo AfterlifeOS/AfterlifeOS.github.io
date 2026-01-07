@@ -2,25 +2,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const timelineContainer = document.querySelector('.timeline');
     if (!timelineContainer) return;
 
-    // Fetch data with anti-cache timestamp
-    const dataUrl = `/js/data_changelogs.js?v=${Date.now()}`;
+    // Fetch data from External Repo (No Redeploy Needed)
+    // Using timestamp to bust cache
+    const dataUrl = `https://raw.githubusercontent.com/AfterlifeOS/device_afterlife_ota/16/source_changelogs.json?t=${Date.now()}`;
 
     try {
         const response = await fetch(dataUrl);
         if (!response.ok) throw new Error("Failed to load changelogs");
 
-        const scriptContent = await response.text();
-        
-        // Extract JSON from the JS file content
-        // Pattern: removes "window.changelogsData =" from start and ";" from end
-        const jsonString = scriptContent
-            .replace(/^\s*window\.changelogsData\s*=\s*/, '')
-            .replace(/;\s*$/, '');
-
-        // Safe eval to convert string array to object
-        // We use Function instead of JSON.parse because the file might strictly be JS object notation (not strict JSON)
-        // e.g. keys might not be quoted, or it uses backticks
-        const data = new Function('return ' + jsonString)();
+        // Parse pure JSON
+        const data = await response.json();
 
         if (Array.isArray(data)) {
             renderChangelogs(data, timelineContainer);

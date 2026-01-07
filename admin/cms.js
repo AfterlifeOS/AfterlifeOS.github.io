@@ -117,9 +117,8 @@ const AdminCMS = {
             this.currentSha = json.sha;
             
             const content = new TextDecoder().decode(Uint8Array.from(atob(json.content), c => c.charCodeAt(0)));
-            const jsonString = content.replace('window.changelogsData =', '').replace(/;[ 	]*$/, '').trim();
-            
-            this.data = new Function('return ' + jsonString)();
+            // Parse Pure JSON
+            this.data = JSON.parse(content);
             this.renderList();
         } catch (e) {
             list.innerHTML = `<div style="color:#ff4d4d">Error loading data: ${e.message}</div>`;
@@ -255,7 +254,8 @@ const AdminCMS = {
         btn.disabled = true;
         btn.textContent = 'Saving...';
 
-        const fileContent = `window.changelogsData = ${JSON.stringify(this.data, null, 4)};`;
+        // Format as Pure JSON
+        const fileContent = JSON.stringify(this.data, null, 4);
         const contentEncoded = btoa(String.fromCharCode(...new TextEncoder().encode(fileContent)));
 
         try {
