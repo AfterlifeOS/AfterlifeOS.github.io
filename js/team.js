@@ -25,7 +25,7 @@ async function loadMaintainers() {
 
     try {
         // Fetch from the same source as downloads page
-        const response = await fetch('https://raw.githubusercontent.com/AfterlifeOS/device_afterlife_ota/refs/heads/16/devices.json');
+        const response = await fetch('https://raw.githubusercontent.com/AfterlifeOS/device_afterlife_ota/refs/heads/16.2/devices.json');
         if (!response.ok) throw new Error('Failed to load maintainers');
         
         const data = await response.json();

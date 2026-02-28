@@ -270,7 +270,7 @@ function updateBrandFilterOptions() {
 
 async function fetchUpdateJson(codename) {
   try {
-    const url = `https://raw.githubusercontent.com/AfterlifeOS/device_afterlife_ota/refs/heads/16/${codename}/updates.json`;
+    const url = `https://raw.githubusercontent.com/AfterlifeOS/device_afterlife_ota/refs/heads/16.2/${codename}/updates.json`;
     const res = await cachedFetch(url, { cache: 'default' });
     if (!res.ok) return null;
     const data = await res.json();
