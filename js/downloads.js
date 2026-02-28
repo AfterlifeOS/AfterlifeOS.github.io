@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   const loading = document.querySelector('.loading-state');
 
   // Updated Data Source: AfterlifeOS GitHub Repo
-  const DATA_URL = 'https://raw.githubusercontent.com/AfterlifeOS/device_afterlife_ota/refs/heads/16/devices.json';
+  const DATA_URL = 'https://raw.githubusercontent.com/AfterlifeOS/device_afterlife_ota/refs/heads/16.2/devices.json';
 
   try {
     if(loading) loading.style.display = 'flex';
@@ -328,15 +328,15 @@ function renderVariantInfo(variants) {
 
 async function fetchDeviceChangelog(codename) {
   try {
-    const urlMdPlural = `https://raw.githubusercontent.com/AfterlifeOS/device_afterlife_ota/refs/heads/16/${codename}/changelogs.md`;
+    const urlMdPlural = `https://raw.githubusercontent.com/AfterlifeOS/device_afterlife_ota/refs/heads/16.2/${codename}/changelogs.md`;
     const resMdPlural = await cachedFetch(urlMdPlural, { cache: 'default' });
     if (resMdPlural.ok) return await resMdPlural.text();
 
-    const urlMd = `https://raw.githubusercontent.com/AfterlifeOS/device_afterlife_ota/refs/heads/16/${codename}/changelog.md`;
+    const urlMd = `https://raw.githubusercontent.com/AfterlifeOS/device_afterlife_ota/refs/heads/16.2/${codename}/changelog.md`;
     const resMd = await cachedFetch(urlMd, { cache: 'default' });
     if (resMd.ok) return await resMd.text();
 
-    const urlTxt = `https://raw.githubusercontent.com/AfterlifeOS/device_afterlife_ota/refs/heads/16/${codename}/changelog.txt`;
+    const urlTxt = `https://raw.githubusercontent.com/AfterlifeOS/device_afterlife_ota/refs/heads/16.2/${codename}/changelog.txt`;
     const resTxt = await cachedFetch(urlTxt, { cache: 'default' });
     if (resTxt.ok) return await resTxt.text();
     return null;
