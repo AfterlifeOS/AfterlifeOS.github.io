@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Fetch data from External Repo (No Redeploy Needed)
     // Using timestamp to bust cache
-    const dataUrl = `https://raw.githubusercontent.com/AfterlifeOS/device_afterlife_ota/16/source_changelogs.json?t=${Date.now()}`;
+    const dataUrl = `https://raw.githubusercontent.com/AfterlifeOS/device_afterlife_ota/16.2/source_changelogs.json?t=${Date.now()}`;
 
     try {
         const response = await fetch(dataUrl);
